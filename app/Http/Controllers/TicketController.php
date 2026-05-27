@@ -1,0 +1,85 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Ticket;
+
+class TicketController extends Controller
+{
+    public function indexWeb()
+    {
+        $tickets = \App\Models\Ticket::all();
+        return view('tickets.index', compact('tickets'));
+    }
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $tickets = Ticket::with('zones', 'pricingRules')->get();
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar tiket berhasil diambil',
+            'data' => $tickets
+        ], 200);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * dipake nanti saat nambah jenis tiket baru
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'ticket_type' => 'required|string|unique:tickets,ticket_type',
+            'base_price' => 'required|numeric|min:0',
+        ]);
+
+        $ticket = Ticket::create($request->all());
+        return response()->json([
+            'success' => true,
+            'message' => 'Tiket berhasil dibuat',
+            'data' => $ticket
+        ], 201);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
