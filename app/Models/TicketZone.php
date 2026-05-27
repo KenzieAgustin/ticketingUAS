@@ -6,5 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class TicketZone extends Model
 {
-    //
+    protected $fillable = [
+        'ticket_id',
+        'zone_name',
+        'quota_total',
+        'quota_remaining',
+    ];
+
+    //relasi ke ticket
+    public function ticket()
+    {
+        return $this->belongsTo(Ticket::class);
+    }
+
+    //relasi ke wait_lists
+    public function waitLists()
+    {
+        return $this->hasMany(WaitList::class);
+    }
 }
