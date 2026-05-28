@@ -9,6 +9,7 @@ class TicketZone extends Model
     protected $fillable = [
         'ticket_id',
         'zone_name',
+        'price',
         'quota_total',
         'quota_remaining',
     ];
@@ -23,5 +24,10 @@ class TicketZone extends Model
     public function waitLists()
     {
         return $this->hasMany(WaitList::class);
+    }
+
+    public function isAvailable()
+    {
+        return $this->quota_remaining > 0;
     }
 }
