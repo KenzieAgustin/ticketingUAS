@@ -17,6 +17,11 @@ Route::get('/view-tickets', [TicketController::class, 'indexWeb']);
 Route::get('/tickets', [TicketController::class, 'index']);
 Route::post('/tickets', [TicketController::class, 'store']);
 
+Route::get('/tickets/{id}/buy',[TicketController::class, 'buyWeb']);
+Route::get('/scan', [TicketTokenController::class, 'scanWeb']);
+
+Route::post('/tokens/validate', [TicketTokenController::class, 'validateToken']);
+
 Route::get('/zones/{ticket_id}', [TicketZoneController::class, 'getZoneByTicket']);
 Route::post('/zones/reduce', [TicketZoneController::class, 'reduceQuota']);
 
