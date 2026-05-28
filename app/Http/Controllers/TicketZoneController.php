@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\models\TicketZone;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TicketZoneController extends Controller
 {
@@ -23,24 +24,38 @@ class TicketZoneController extends Controller
             'ticket_zone_id' => 'required|exist:ticket_zones,id'
         ]);
 
-        $zone = TicketZone::find($request->ticket_zone_id);
+        try {
+            $zone = null;
 
-        //cek ketersediaan kuota
-        if (!$zone->isAvailable()) {
+            DB::transaction(function () use ($request, &$zone) {
+                $zone = TicketZone::LookForUpdate()->find($request->ticket_zone_id);
+
+                if (!$zone->isAvailable()) {
+                    throw new \Exception('Kuota sudah habis');
+                }
+
+                $zone->decrement('quota_remaining');
+
+            });
+            return response()->json([
+                'success' => true,
+                'message' => 'Kuota berhasil dikurangi',
+                'data' => $zone->fresh()
+            ], 200);
+        } catch (\Exception $e) {
+            if ($e->getMessage() === 'Kuota sudah habis') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kuota sudah habis'
+                ], 400);
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => 'Maaf, kuota untuk zona ini sudah habis'
-            ], 400);
+                'message' => 'Terjadi kesalahan: '
+            ], 500);
         }
 
-        //kurangi kuota
-        $zone->decrement('quota_remaining');
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Kuota berhasil dikurangi',
-            'data' => $zone
-        ], 200);
     }
     /**
      * Display a listing of the resource.

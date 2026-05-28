@@ -4,16 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Models\PricingRule;
 use App\Models\Ticket;
+use App\Models\TicketZone;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PricingRuleController extends Controller
 {
     //perhitungan harga
-    public function calculateFinalPrice($ticket_id)
+    public function calculateFinalPrice(Request $request, $ticket_id)
     {
         $ticket = Ticket::findOrFail($ticket_id);
         $today = Carbon::now()->toDateString();
+
+        $basePrice = $ticket->price;
+        if ($request->has('zone_id')) {
+            $zone = TicketZone::find($request->zone_id);
+            if ($zone) {
+                $basePrice = $zone->price;
+            }
+        }
 
         //cari promo yg aktif untuk tiker per hari ini
         $activePromo = PricingRule::where('ticket_id', $ticket_id)
@@ -21,22 +30,32 @@ class PricingRuleController extends Controller
             ->where('end_date', '>=', $today)
             ->first();
         
-        $finalPrice = $ticket->base_price;
+        $finalPrice = $basePrice;
         $discountApplied =0;
 
         if ($activePromo) {
-            $discountApplied = $activePromo->discount_value;
-            $finalPrice = max(0, $ticket->base_price - $discountApplied);
+            if ($activePromo->discount_type === 'fixed') {
+                $discountApplied = $activePromo->discount_value;
+            } elseif ($activePromo->discount_type === 'percentage') {
+                $discountApplied = round($basePrice * ($activePromo->discount_value / 100));
+            }
+            $finalPrice = max(0, $basePrice - $discountApplied);
         }
 
         return response()->json([
-            'success' => true,
-            'ticket_type' => $ticket->ticket_type,
-            'original_price' => $ticket->base_price,
-            'discount' => $discountApplied,
-            'final_price' => $finalPrice,
-            'promo_name' => $activePromo ? $activePromo->rule_name : 'Harga normal'
-            ], 200);
+            'success'        => true,
+            'ticket_type'    => $ticket->ticket_type,
+            'base_price'     => $basePrice,
+            'discount'       => $discountApplied,
+            'final_price'    => $finalPrice,
+            'promo_name'     => $activePromo ? $activePromo->rule_name : 'Harga Normal',
+        ], 200);
+    }
+
+    public function adminWeb()
+    {
+        $rules = PricingRule::with('ticket')->get();
+        return view('admin.pricing', compact('rules'));
     }
     /**
      * Display a listing of the resource.

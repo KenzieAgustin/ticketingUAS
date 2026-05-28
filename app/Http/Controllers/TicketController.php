@@ -7,9 +7,14 @@ use App\Models\Ticket;
 
 class TicketController extends Controller
 {
+    public function buyWeb($id)
+    {
+        $ticket = Ticket::with('zones', 'pricingRules')->findOrFail($id);
+        return view('tickets.buy', compact('ticket'));
+    }
     public function indexWeb()
     {
-        $tickets = \App\Models\Ticket::all();
+        $tickets = Ticket::all();
         return view('tickets.index', compact('tickets'));
     }
     /**

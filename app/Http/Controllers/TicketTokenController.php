@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Str;
+use App\Models\TicketToken;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Http\Request;
 
 class TicketTokenController extends Controller
 {
-    //Membuat tiket setelah orderan lunas
+    // Membuat tiket setelah orderan lunas
     public function generateToken(Request $request)
     {
         $request->validate([
             'order_item_id' => 'required|integer',
         ]);
 
-        $bookingCode = 'PRJ-' . strtoupper(Str::random(6));
+        $bookingCode = 'PRJ2026-' . strtoupper(Str::random(6));
 
         if (!file_exists(public_path('qrcodes'))) {
             mkdir(public_path('qrcodes'), 0777, true);
@@ -24,73 +27,61 @@ class TicketTokenController extends Controller
 
         QrCode::format('png')->size(250)->generate($bookingCode, $path);
 
-        ///simpen info tiket ke database
         $token = TicketToken::create([
             'order_item_id' => $request->order_item_id,
-            'booking_code' => $bookingCode,
-            'qr_code_path' => 'qrcodes/' . $fileName,
-            'status' => 'valid',
+            'booking_code'  => $bookingCode,
+            'qr_code_path'  => 'qrcodes/' . $fileName,
+            'status'        => 'valid',
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Tiket & QR Code berhasil dibuat',
-            'data' => $token
+            'data'    => $token
         ], 201);
     }
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+    // Validasi booking code — dipanggil dari halaman scan
+    public function validateToken(Request $request)
     {
-        //
+        $request->validate([
+            'booking_code' => 'required|string',
+        ]);
+
+        $token = TicketToken::where('booking_code', $request->booking_code)->first();
+
+        if (!$token) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Booking code tidak ditemukan.',
+            ], 404);
+        }
+
+        if ($token->status === 'used') {
+            return response()->json([
+                'success' => false,
+                'status'  => 'used',
+                'message' => 'Tiket ini sudah digunakan.',
+                'data'    => ['booking_code' => $token->booking_code],
+            ], 200);
+        }
+
+        // Mark as used
+        $token->update(['status' => 'used']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tiket valid. Selamat datang di PRJ 2026!',
+            'data'    => [
+                'booking_code' => $token->booking_code,
+                'status'       => 'used',
+            ],
+        ], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // Halaman scan untuk petugas
+    public function scanWeb()
     {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return view('scan.index');
     }
 }
