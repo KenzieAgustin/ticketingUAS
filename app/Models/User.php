@@ -56,4 +56,23 @@ class User extends Authenticatable
             : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=random';
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isStaffGate(): bool
+    {
+        return $this->role === 'staff_gate';
+    }
+
+    public function isCustomer():bool
+    {
+        return $this->role === 'customer';
+    }
+
+    public function hasRole(string|array $roles):bool
+    {
+        return in_array($this->role, (array) $roles);
+    }
 }
