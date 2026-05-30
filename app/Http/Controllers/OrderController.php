@@ -37,11 +37,17 @@ class OrderController extends Controller
         try {
             $snapToken = Snap::getSnapToken($params);
 
-            return response()->json([
-                'status' => 'success',
-                'order_number' => $order->order_number,
-                'snap_token' => $snapToken
-            ]);
+            //return response()->json([
+            //    'status' => 'success',
+            //    'order_number' => $order->order_number,
+            //    'snap_token' => $snapToken
+            //]);
+
+            return view('checkout', [
+                'snapToken' => $snapToken,
+                'order' => $order
+                ]);
+
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
