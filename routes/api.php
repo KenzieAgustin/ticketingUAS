@@ -9,3 +9,4 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::post('/midtrans-callback', [PaymentController::class, 'webhook']);
+Route::post('/payment-callback', [PaymentController::class, 'webhook']);

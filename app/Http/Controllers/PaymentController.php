@@ -10,6 +10,9 @@ class PaymentController extends Controller
 {
     public function webhook(Request $request)
     {
+
+        \Log::info('Data masuk dari Midtrans:', $request->all());
+
         $serverKey = env('MIDTRANS_SERVER_KEY');
         $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
 
