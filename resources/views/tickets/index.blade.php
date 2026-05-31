@@ -16,22 +16,23 @@
             <tr>
                 <th width="50">No</th>
                 <th>Tipe / Jenis Tiket</th>
-                <th>Harga Dasar (Base Price)</th>
+                <th>Harga Dasar</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($tickets as $index => $ticket)
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td><strong>{{ $ticket->ticket_type }}</strong></td>
-                <td>Rp {{ number_format($ticket->base_price, 0, ',', '.') }}</td>
+                <td><strong>{{ $ticket->ticket_type === 'entry_only' ? 'Masuk Saja' : 'Masuk + Konser' }}</strong></td>
+                <td>Rp {{ number_format($ticket->price, 0, ',', '.') }}</td>
+                <td>
+                    <a href="{{ url('/tickets/' . $ticket->id . '/buy') }}">Beli Tiket →</a>
+                </td>
             </tr>
             @endforeach
         </tbody>
     </table>
-
-    <br>
-    <a href="{{ url('/view-zones') }}">Concert Zone &rarr;</a>
 
 </body>
 </html>
