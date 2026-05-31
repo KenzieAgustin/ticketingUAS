@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ticket;
+use App\Models\PricingRule;
 
 class TicketController extends Controller
 {
@@ -29,6 +30,16 @@ class TicketController extends Controller
             'data' => $tickets
         ], 200);
     }
+    public function adminWeb()
+{
+    $tickets      = Ticket::with('zones', 'pricingRules')->get();
+    $pricingRules = PricingRule::with('ticket')->get();
+    $activePromos = PricingRule::where('start_date', '<=', now())
+                               ->where('end_date', '>=', now())
+                               ->get();
+
+    return view('admin.tickets', compact('tickets', 'pricingRules', 'activePromos'));
+}
 
     /**
      * Show the form for creating a new resource.

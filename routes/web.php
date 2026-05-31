@@ -14,7 +14,7 @@ Route::get('/', function () {
 
 Route::get('/view-tickets', [TicketController::class, 'indexWeb']);
 //daftar tiket dan zonanya
-Route::get('/tickets', [TicketController::class, 'index']);
+Route::get('/tickets', [TicketController::class, 'indexWeb']);
 Route::post('/tickets', [TicketController::class, 'store']);
 
 Route::get('/tickets/{id}/buy',[TicketController::class, 'buyWeb']);
@@ -30,3 +30,5 @@ Route::get('/tickets/{id}/calculate-price', [PricingRuleController::class, 'calc
 Route::post('/waitlist/join', [WaitListController::class, 'joinWaitList']);
 
 Route::post('/tokens/generate', [TicketTokenController::class, 'generateToken']);
+
+Route::get('/admin/tickets', [TicketController::class, 'adminWeb']);
