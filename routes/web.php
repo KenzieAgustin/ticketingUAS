@@ -24,3 +24,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile', [UserController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password');
 });
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard',          [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::patch('/users/{user}/role', [AdminController::class, 'updateRole'])->name('role.update');
+});
+
+Route::middleware(['auth', 'role:admin,staff_gate'])->prefix('staff')->name('staff.')->group(function () {
+    // fitur untuk staff gate
+});
