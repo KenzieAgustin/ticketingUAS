@@ -12,6 +12,11 @@
 
     <nav>
         <a href="{{ route('profile.show') }}">Profil Saya</a> |
+
+        @if(Auth::user()->isAdmin())
+            <a href="{{ route('admin.dashboard') }}">Admin Dashboard</a> |
+        @endif
+
         <form method="POST" action="{{ route('logout') }}" style="display:inline">
             @csrf
             <button type="submit">Logout</button>
