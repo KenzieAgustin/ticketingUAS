@@ -19,17 +19,19 @@ class OrderController extends Controller
         $order = Order::create([
             'user_id' => 1,
             'order_number' => 'ORD-' . time(),
-            'total_amount' => 500000,
+            'nama' => $request->nama ?? 'Guest',
+            'quantity' => $request->quantity ?? 1,
+            'total_amount' => ($request->quantity ?? 1)*500000,
             'status' => 'pending',
         ]);
 
         $params = [
             'transaction_details' => [
                 'order_id' => $order->order_number,
-                'gross_amount' => $order->total_amount,
+                'gross_amount' => (int)$order->total_amount,
             ],
             'customer_details' => [
-                'first_name' => 'Budi',
+                'first_name' => $order->nama,
                 'email' => 'budi@example.com',
             ],
         ];
@@ -51,5 +53,35 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    // Pastikan kamu meng-import Request di bagian atas file jika belum ada:
+// use Illuminate\Http\Request;
+
+    public function index(Request $request)
+    {
+        $sort = $request->query('sort', 'terbaru');
+        $query = Order::query();
+
+        if ($sort == 'terlama') {
+            $query->orderBy('created_at', 'asc');
+        } elseif ($sort == 'tertinggi') {
+            $query->orderBy('total_amount', 'desc');
+        } elseif ($sort == 'terendah') {
+        $query->orderBy('total_amount', 'asc');
+        } else {
+        $query->orderBy('created_at', 'desc');
+        }
+
+        $orders = $query->get();
+
+        return view('orders.index', compact('orders', 'sort'));
+    }
+
+    public function show($id)
+    {
+    $order = Order::findOrFail($id);
+
+    return view('orders.show', compact('order'));
     }
 }

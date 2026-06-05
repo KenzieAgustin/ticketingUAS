@@ -12,4 +12,9 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
+    public function ticketType()
+    {
+        return $this->belongsTo(TicketType::class);
+    }
 }
