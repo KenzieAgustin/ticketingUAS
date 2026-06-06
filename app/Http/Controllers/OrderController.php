@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Voucher;
 use Midtrans\Config;
 use Midtrans\Snap;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -15,6 +17,24 @@ class OrderController extends Controller
         Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
         Config::$isSanitized = true;
         Config::$is3ds = true;
+
+        $hargaPerTiket = 500000;
+        $quantity = $request->quantity ?? 1;
+        $total_amount = $quantity * $hargaPerTiket;
+
+        if ($request->filled('voucher_code')) {
+            $voucherCode = trim($request->voucher_code);
+            $voucher = Voucher::where('code', $voucherCode)->first();
+
+            if ($voucher && \Carbon\Carbon::parse($voucher->valid_until)->isFuture() && $voucher->max_usage > 0) {
+                $total_amount = $total_amount - $voucher->discount_amount;
+                $voucherId = $voucher->id;
+            }
+        }
+
+        if ($total_amount < 1) {
+            $total_amount = 1;
+        }
 
         $order = Order::create([
             'user_id' => 1,
