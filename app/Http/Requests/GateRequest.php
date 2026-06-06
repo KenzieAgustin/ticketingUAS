@@ -13,7 +13,7 @@ class GateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->hasAnyRole(['admin']);
+        return $this->user()->hasRole(['admin']);
     }
 
     /**

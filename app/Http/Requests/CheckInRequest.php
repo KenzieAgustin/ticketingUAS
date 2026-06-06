@@ -13,7 +13,7 @@ class CheckInRequest extends FormRequest
     public function authorize(): bool
     {
         // Hanya staff_gate & admin yang melakukan scan
-        return $this->user()->hasAnyRole(['staff_gate', 'admin']);
+        return $this->user()->hasRole(['staff_gate', 'admin']);
     }
 
     /**
