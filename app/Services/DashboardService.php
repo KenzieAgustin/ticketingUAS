@@ -9,6 +9,9 @@ class DashboardService
 {
     /**
      * Statistik utama dashboard (di-cache 5 menit).
+     * Disesuaikan dengan struktur Nicho:
+     * - order_items tidak punya event_id, join lewat ticket_types
+     * - total_amount ada di tabel orders
      */
     public function getSummary(?int $eventId = null): array
     {
@@ -19,8 +22,7 @@ class DashboardService
                 'total_visitors'  => $this->totalVisitors($eventId),
                 'total_revenue'   => $this->totalRevenue($eventId),
                 'tickets_sold'    => $this->ticketsSold($eventId),
-                'quota_remaining' => $this->quotaRemaining($eventId),
-                'check_ins_today' => $this->checkInsToday($eventId),
+                'check_ins_today' => $this->checkInsToday(),
                 'avg_rating'      => $this->avgRating($eventId),
                 'pending_reviews' => $this->pendingReviews($eventId),
             ];
@@ -28,7 +30,8 @@ class DashboardService
     }
 
     /**
-     * Rekap penjualan per event, per ticket type, per hari.
+     * Rekap penjualan per ticket_type per hari.
+     * Disesuaikan struktur Nicho — order_items join ticket_types untuk dapat event_id.
      */
     public function getSalesReport(array $filters = []): array
     {
@@ -36,16 +39,16 @@ class DashboardService
             ->join('orders as o', 'o.id', '=', 'oi.order_id')
             ->join('ticket_types as tt', 'tt.id', '=', 'oi.ticket_type_id')
             ->select([
-                'oi.event_id',
+                'tt.event_id',
                 'tt.name as ticket_type',
                 DB::raw('DATE(o.created_at) as sale_date'),
-                DB::raw('COUNT(oi.id) as qty_sold'),
+                DB::raw('SUM(oi.quantity) as qty_sold'),
                 DB::raw('SUM(oi.subtotal) as revenue'),
             ])
             ->where('o.status', 'paid');
 
         if (! empty($filters['event_id'])) {
-            $query->where('oi.event_id', $filters['event_id']);
+            $query->where('tt.event_id', $filters['event_id']);
         }
 
         if (! empty($filters['date_from'])) {
@@ -60,7 +63,8 @@ class DashboardService
             $query->where('oi.ticket_type_id', $filters['ticket_type_id']);
         }
 
-        $rows = $query->groupBy('oi.event_id', 'oi.ticket_type_id', DB::raw('DATE(o.created_at)'))
+        $rows = $query
+            ->groupBy('tt.event_id', 'oi.ticket_type_id', DB::raw('DATE(o.created_at)'))
             ->orderBy('sale_date')
             ->get();
 
@@ -92,7 +96,8 @@ class DashboardService
             $query->whereDate('ci.checked_at', $date);
         }
 
-        $rows = $query->groupBy('ci.gate_id', DB::raw('DATE(ci.checked_at)'))
+        $rows = $query
+            ->groupBy('ci.gate_id', DB::raw('DATE(ci.checked_at)'))
             ->orderBy('check_date')
             ->get();
 
@@ -108,59 +113,44 @@ class DashboardService
 
     private function totalVisitors(?int $eventId): int
     {
-        $q = DB::table('check_ins')->where('status', 'success');
-        if ($eventId) {
-            $q->join('ticket_tokens', 'ticket_tokens.id', '=', 'check_ins.ticket_token_id')
-              ->where('ticket_tokens.event_id', $eventId);
-        }
-        return $q->count();
+        return DB::table('check_ins')
+            ->where('status', 'success')
+            ->count();
     }
 
     private function totalRevenue(?int $eventId): float
     {
+        $query = DB::table('orders')->where('status', 'paid');
+
         if ($eventId) {
-            return (float) DB::table('orders')
-                ->join('order_items', 'order_items.order_id', '=', 'orders.id')
-                ->where('orders.status', 'paid')
-                ->where('order_items.event_id', $eventId)
-                ->sum('order_items.subtotal');
+            // Join lewat order_items dan ticket_types untuk filter by event
+            $query = DB::table('orders as o')
+                ->join('order_items as oi', 'oi.order_id', '=', 'o.id')
+                ->join('ticket_types as tt', 'tt.id', '=', 'oi.ticket_type_id')
+                ->where('o.status', 'paid')
+                ->where('tt.event_id', $eventId);
+
+            return (float) $query->sum('oi.subtotal');
         }
-        return (float) DB::table('orders')
-            ->where('status', 'paid')
-            ->sum('total_amount');
+
+        return (float) $query->sum('total_amount');
     }
 
     private function ticketsSold(?int $eventId): int
     {
-        $q = DB::table('order_items')
-            ->join('orders', 'orders.id', '=', 'order_items.order_id')
-            ->where('orders.status', 'paid');
+        $query = DB::table('order_items as oi')
+            ->join('orders as o', 'o.id', '=', 'oi.order_id')
+            ->join('ticket_types as tt', 'tt.id', '=', 'oi.ticket_type_id')
+            ->where('o.status', 'paid');
+
         if ($eventId) {
-            $q->where('order_items.event_id', $eventId);
+            $query->where('tt.event_id', $eventId);
         }
-        return $q->count();
+
+        return (int) $query->sum('oi.quantity');
     }
 
-    private function quotaRemaining(?int $eventId): array
-    {
-        $q = DB::table('quota_trackers');
-        if ($eventId) {
-            $q->where('event_id', $eventId);
-        }
-        $result = $q->selectRaw('
-            SUM(total_quota) as total_quota,
-            SUM(sold_quota) as sold_quota,
-            SUM(total_quota - sold_quota) as remaining
-        ')->first();
-
-        return $result ? (array) $result : [
-            'total_quota' => 0,
-            'sold_quota'  => 0,
-            'remaining'   => 0,
-        ];
-    }
-
-    private function checkInsToday(?int $eventId): int
+    private function checkInsToday(): int
     {
         return DB::table('check_ins')
             ->where('status', 'success')
@@ -170,19 +160,19 @@ class DashboardService
 
     private function avgRating(?int $eventId): float
     {
-        $q = DB::table('reviews')->where('status', 'approved');
+        $query = DB::table('reviews')->where('status', 'approved');
         if ($eventId) {
-            $q->where('event_id', $eventId);
+            $query->where('event_id', $eventId);
         }
-        return round((float) $q->avg('rating'), 1);
+        return round((float) $query->avg('rating'), 1);
     }
 
     private function pendingReviews(?int $eventId): int
     {
-        $q = DB::table('reviews')->where('status', 'pending');
+        $query = DB::table('reviews')->where('status', 'pending');
         if ($eventId) {
-            $q->where('event_id', $eventId);
+            $query->where('event_id', $eventId);
         }
-        return $q->count();
+        return $query->count();
     }
 }

@@ -10,7 +10,8 @@ class CheckInService
 {
     /**
      * Proses scan tiket (QR atau kode manual).
-     * Mengembalikan array result dengan status & pesan.
+     * Disesuaikan dengan struktur TicketToken milik Kenzie:
+     * - kolom: booking_code, status ('valid'/'used'), order_item_id, qr_code_path
      */
     public function process(
         string $bookingCode,
@@ -26,7 +27,7 @@ class CheckInService
                 return $this->failResult($bookingCode, $gateId, $staffId, $method, 'Gate tidak aktif atau tidak ditemukan.');
             }
 
-            // 2. Cek duplikat — tiket sudah pernah di-check-in sukses
+            // 2. Cek duplikat di tabel check_ins
             $duplicate = CheckIn::where('booking_code', $bookingCode)
                 ->where('status', 'success')
                 ->exists();
@@ -41,27 +42,37 @@ class CheckInService
                 ];
             }
 
-            // 3. Validasi booking_code ke Orang3 (TicketToken)
-            // Asumsikan ada model TicketToken & kolom booking_code + is_used
+            // 3. Validasi booking_code ke tabel ticket_tokens (Kenzie)
+            // Kenzie pakai kolom status: 'valid' atau 'used'
             $ticketToken = DB::table('ticket_tokens')
                 ->where('booking_code', $bookingCode)
-                ->where('is_used', false)
+                ->where('status', 'valid')
                 ->first();
 
             if (! $ticketToken) {
-                $this->recordCheckIn($bookingCode, null, null, $gateId, $staffId, $method, 'failed', 'Kode booking tidak valid atau sudah digunakan.');
+                // Cek apakah tiket ada tapi sudah dipakai
+                $usedToken = DB::table('ticket_tokens')
+                    ->where('booking_code', $bookingCode)
+                    ->where('status', 'used')
+                    ->first();
+
+                $reason = $usedToken
+                    ? 'Tiket ini sudah digunakan.'
+                    : 'Kode booking tidak valid.';
+
+                $this->recordCheckIn($bookingCode, null, null, $gateId, $staffId, $method, 'failed', $reason);
                 return [
                     'success'      => false,
                     'status'       => 'failed',
-                    'message'      => 'Kode booking tidak valid.',
+                    'message'      => $reason,
                     'booking_code' => $bookingCode,
                 ];
             }
 
-            // 4. Mark token as used
+            // 4. Mark token as used (sesuai Kenzie — update status jadi 'used')
             DB::table('ticket_tokens')
                 ->where('id', $ticketToken->id)
-                ->update(['is_used' => true, 'used_at' => now()]);
+                ->update(['status' => 'used']);
 
             // 5. Simpan check-in sukses
             $checkIn = $this->recordCheckIn(
@@ -75,13 +86,13 @@ class CheckInService
             );
 
             return [
-                'success'       => true,
-                'status'        => 'success',
-                'message'       => 'Check-in berhasil. Selamat datang!',
-                'booking_code'  => $bookingCode,
-                'check_in_id'   => $checkIn->id,
-                'checked_at'    => $checkIn->checked_at,
-                'gate'          => $gate->name,
+                'success'      => true,
+                'status'       => 'success',
+                'message'      => 'Check-in berhasil. Selamat datang di PRJ 2026!',
+                'booking_code' => $bookingCode,
+                'check_in_id'  => $checkIn->id,
+                'checked_at'   => $checkIn->checked_at,
+                'gate'         => $gate->name,
             ];
         });
     }

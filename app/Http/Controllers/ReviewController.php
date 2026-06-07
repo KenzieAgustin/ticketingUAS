@@ -13,7 +13,7 @@ class ReviewController extends Controller
 {
     /**
      * GET /api/reviews
-     * List ulasan publik (sudah approved).
+     * List ulasan publik yang sudah approved.
      */
     public function index(Request $request): JsonResponse
     {
@@ -30,10 +30,9 @@ class ReviewController extends Controller
             ->latest()
             ->paginate($request->per_page ?? 15);
 
-        // Sembunyikan nama jika is_anonymous
         $reviews->getCollection()->transform(function (Review $r) {
             $r->display_name = $r->display_name;
-            if ($r->is_anonymous) {
+            if ($r->is_anonymous ?? false) {
                 unset($r->user_id);
             }
             return $r;
@@ -44,7 +43,9 @@ class ReviewController extends Controller
 
     /**
      * POST /api/reviews
-     * Customer submit ulasan (harus pernah beli tiket event tersebut).
+     * Customer submit ulasan.
+     * Verifikasi: user harus pernah beli tiket event ini.
+     * Disesuaikan struktur Nicho — order_items join ticket_types untuk cek event_id.
      */
     public function store(ReviewRequest $request): JsonResponse
     {
@@ -52,11 +53,13 @@ class ReviewController extends Controller
         $user = $request->user();
 
         // Verifikasi user pernah beli tiket event ini
-        $hasBought = DB::table('orders')
-            ->join('order_items', 'order_items.order_id', '=', 'orders.id')
-            ->where('orders.user_id', $user->id)
-            ->where('orders.status', 'paid')
-            ->where('order_items.event_id', $request->event_id)
+        // order_items tidak punya event_id langsung, harus join ticket_types (Nicho)
+        $hasBought = DB::table('orders as o')
+            ->join('order_items as oi', 'oi.order_id', '=', 'o.id')
+            ->join('ticket_types as tt', 'tt.id', '=', 'oi.ticket_type_id')
+            ->where('o.user_id', $user->id)
+            ->where('o.status', 'paid')
+            ->where('tt.event_id', $request->event_id)
             ->exists();
 
         if (! $hasBought) {
@@ -91,11 +94,8 @@ class ReviewController extends Controller
         return response()->json(['success' => true, 'data' => $review]);
     }
 
-    // ── Admin endpoints ───────────────────────────────────────────────────────
-
     /**
-     * GET /api/admin/reviews
-     * Semua ulasan termasuk pending & rejected (Admin).
+     * GET /api/admin/reviews — Admin lihat semua ulasan
      */
     public function adminIndex(Request $request): JsonResponse
     {
@@ -109,7 +109,7 @@ class ReviewController extends Controller
     }
 
     /**
-     * PATCH /api/admin/reviews/{review}/approve
+     * PATCH /api/reviews/{review}/approve
      */
     public function approve(Review $review): JsonResponse
     {
@@ -126,7 +126,7 @@ class ReviewController extends Controller
     }
 
     /**
-     * PATCH /api/admin/reviews/{review}/reject
+     * PATCH /api/reviews/{review}/reject
      */
     public function reject(Request $request, Review $review): JsonResponse
     {
@@ -146,7 +146,6 @@ class ReviewController extends Controller
 
     /**
      * GET /api/reviews/event/{eventId}/summary
-     * Ringkasan rating per event.
      */
     public function eventSummary(int $eventId): JsonResponse
     {
