@@ -10,7 +10,6 @@ class CheckInService
 {
     /**
      * Proses scan tiket (QR atau kode manual).
-     * Disesuaikan dengan struktur TicketToken milik Kenzie:
      * - kolom: booking_code, status ('valid'/'used'), order_item_id, qr_code_path
      */
     public function process(
@@ -42,8 +41,7 @@ class CheckInService
                 ];
             }
 
-            // 3. Validasi booking_code ke tabel ticket_tokens (Kenzie)
-            // Kenzie pakai kolom status: 'valid' atau 'used'
+            // 3. Validasi booking_code ke tabel ticket_tokens
             $ticketToken = DB::table('ticket_tokens')
                 ->where('booking_code', $bookingCode)
                 ->where('status', 'valid')
@@ -69,7 +67,7 @@ class CheckInService
                 ];
             }
 
-            // 4. Mark token as used (sesuai Kenzie — update status jadi 'used')
+            // 4. Mark token as used
             DB::table('ticket_tokens')
                 ->where('id', $ticketToken->id)
                 ->update(['status' => 'used']);

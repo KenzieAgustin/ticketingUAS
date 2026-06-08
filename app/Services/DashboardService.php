@@ -29,10 +29,8 @@ class DashboardService
         });
     }
 
-    /**
-     * Rekap penjualan per ticket_type per hari.
-     * Disesuaikan struktur Nicho — order_items join ticket_types untuk dapat event_id.
-     */
+    // Rekap penjualan per ticket_type per hari.
+
     public function getSalesReport(array $filters = []): array
     {
         $query = DB::table('order_items as oi')

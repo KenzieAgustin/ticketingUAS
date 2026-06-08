@@ -45,7 +45,6 @@ class ReviewController extends Controller
      * POST /api/reviews
      * Customer submit ulasan.
      * Verifikasi: user harus pernah beli tiket event ini.
-     * Disesuaikan struktur Nicho — order_items join ticket_types untuk cek event_id.
      */
     public function store(ReviewRequest $request): JsonResponse
     {
@@ -53,7 +52,7 @@ class ReviewController extends Controller
         $user = $request->user();
 
         // Verifikasi user pernah beli tiket event ini
-        // order_items tidak punya event_id langsung, harus join ticket_types (Nicho)
+        // order_items tidak punya event_id langsung, harus join ticket_types untuk cek event_id
         $hasBought = DB::table('orders as o')
             ->join('order_items as oi', 'oi.order_id', '=', 'o.id')
             ->join('ticket_types as tt', 'tt.id', '=', 'oi.ticket_type_id')
