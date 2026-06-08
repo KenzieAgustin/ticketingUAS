@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PRJ Ticketing Event & Konser</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
         * { box-sizing: border-box; }
         body { background-color: #f8f9fa; margin: 0; }
@@ -18,7 +19,7 @@
             top: 0;
         }
 
-        /* BRAND - gradasi rainbow */
+        
         .sidebar .brand {
             background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
             -webkit-background-clip: text;
@@ -40,7 +41,7 @@
             letter-spacing: 2px;
         }
 
-        /* Tiap menu beda warna */
+        
         .sidebar a {
             text-decoration: none;
             display: flex;
@@ -58,7 +59,7 @@
 
         .sidebar a:hover { color: white; transform: translateX(4px); }
 
-        /* Warna per menu */
+        
         .sidebar a.menu-1:hover, .sidebar a.menu-1.active { background: rgba(255, 107, 107, 0.2); border-left-color: #ff6b6b; color: #ff6b6b; }
         .sidebar a.menu-2:hover, .sidebar a.menu-2.active { background: rgba(255, 217, 61, 0.2); border-left-color: #ffd93d; color: #ffd93d; }
         .sidebar a.menu-3:hover, .sidebar a.menu-3.active { background: rgba(107, 203, 119, 0.2); border-left-color: #6bcb77; color: #6bcb77; }
@@ -66,7 +67,7 @@
         .sidebar a.menu-5:hover, .sidebar a.menu-5.active { background: rgba(255, 154, 86, 0.2); border-left-color: #ff9a56; color: #ff9a56; }
         .sidebar a.menu-6:hover, .sidebar a.menu-6.active { background: rgba(199, 125, 255, 0.2); border-left-color: #c77dff; color: #c77dff; }
 
-        /* HEADER gradasi rainbow */
+        
         .top-header {
             background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
             padding: 12px 24px;
@@ -85,43 +86,19 @@
             align-items: center;
             margin-bottom: 24px;
         }
-
-        /* Step guide */
-        .step-guide {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border-radius: 12px;
-            padding: 14px 20px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .step-guide span { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
-        .step-guide .step {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.78rem;
-            font-weight: 600;
-        }
-        .step-guide .step.done { background: #6bcb77; color: #1a1a2e; }
-        .step-guide .step.current { background: #4d96ff; color: white; }
-        .step-guide .arrow { color: rgba(255,255,255,0.3); font-size: 0.7rem; }
     </style>
 </head>
 <body>
 <div class="container-fluid">
     <div class="row">
-        {{-- Sidebar --}}
+        
         <div class="col-md-2 px-0 sidebar">
             <div class="brand">
                 <i class="bi bi-ticket-perforated-fill"></i> PRJ Ticketing
             </div>
             <div class="nav-label">Event & Konser</div>
 
-            {{-- Urutan sesuai alur pengisian --}}
+            
             <a href="{{ route('web.event-categories.index') }}"
                class="menu-1 {{ request()->routeIs('web.event-categories.*') ? 'active' : '' }}">
                 <i class="bi bi-tags-fill"></i>
@@ -154,31 +131,15 @@
             </a>
         </div>
 
-        {{-- Main Content --}}
+        
         <div class="col-md-10 px-0">
 
-            {{-- Rainbow header bar --}}
+            
             <div class="top-header">
                 🎪 PRJ — Pekan Raya Jakarta · Event & Konser Management
             </div>
 
             <div class="main-content">
-
-                {{-- Step guide --}}
-                <div class="step-guide">
-                    <span>Urutan isi data:</span>
-                    <span class="step {{ request()->routeIs('web.event-categories.*') ? 'current' : '' }}">1 Kategori</span>
-                    <span class="arrow">→</span>
-                    <span class="step {{ request()->routeIs('web.stages.*') ? 'current' : '' }}">2 Stage</span>
-                    <span class="arrow">→</span>
-                    <span class="step {{ request()->routeIs('web.events.*') ? 'current' : '' }}">3 Event</span>
-                    <span class="arrow">→</span>
-                    <span class="step {{ request()->routeIs('web.performers.*') ? 'current' : '' }}">4 Performer</span>
-                    <span class="arrow">→</span>
-                    <span class="step {{ request()->routeIs('web.event-schedules.*') ? 'current' : '' }}">5 Jadwal</span>
-                    <span class="arrow">→</span>
-                    <span class="step {{ request()->routeIs('web.event-media.*') ? 'current' : '' }}">6 Media</span>
-                </div>
 
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show">
