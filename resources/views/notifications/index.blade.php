@@ -34,7 +34,6 @@
 @forelse($notifications as $notif)
     @php $data = $notif->data; @endphp
     <div style="border:1px solid {{ $notif->read_at ? '#ccc' : '#3498db' }}; padding:10px; margin-bottom:10px; border-radius:4px;">
-        <span style="font-size:18px">{{ $data['icon'] ?? 'ℹ️' }}</span>
         <span style="{{ !$notif->read_at ? 'font-weight:bold' : '' }}">
             {{ $data['message'] }}
         </span>
