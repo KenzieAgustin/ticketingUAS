@@ -13,6 +13,14 @@
     <nav>
         <a href="{{ route('profile.show') }}">Profil Saya</a> |
 
+        <a href="{{ route('notifications.index') }}">
+            Notifikasi
+            @php $unread = Auth::user()->unreadNotifications->count() @endphp
+            @if($unread > 0)
+                <strong>({{ $unread }})</strong>
+            @endif
+        </a> |
+        
         @if(Auth::user()->isAdmin())
             <a href="{{ route('admin.dashboard') }}">Admin Dashboard</a> |
         @endif
