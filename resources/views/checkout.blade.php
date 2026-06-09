@@ -3,101 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Selesaikan Pembayaran</title>
+    <title>Checkout PRJ</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-[#f4f4f5] min-h-screen flex flex-col items-center justify-center font-sans p-4 gap-6">
+<body class="bg-white min-h-screen flex items-center justify-center font-sans p-6 text-gray-900">
 
     @if(!isset($snapToken))
-    <div class="w-full max-w-sm bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Beli Tiket FTI UNTAR</h2>
+    <div class="w-full max-w-sm">
+        <h1 class="text-3xl font-bold mb-8 tracking-tight">Checkout Tiket PRJ</h1>
 
-        <form action="/checkout" method="POST" class="flex flex-col gap-4">
+        <form action="/checkout" method="POST" id="checkout-form" class="space-y-6">
             @csrf
-            <div>
-                <label class="text-xs text-gray-500 font-semibold uppercase">Nama Lengkap</label>
-                <input type="text" name="nama" placeholder="Masukkan nama" required class="w-full border border-gray-200 rounded-lg p-3 mt-1 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+
+            <div class="space-y-4">
+                <div>
+                    <input type="text" name="nama" id="nama" placeholder="Nama Lengkap" required
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:bg-white transition-all">
+                </div>
+
+                <div>
+                    <input type="number" name="quantity" id="quantity" value="1" min="1" required placeholder="Jumlah Tiket"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:bg-white transition-all">
+                </div>
+
+                <div class="flex gap-2">
+                    <input type="text" name="voucher_code" id="voucher_code" placeholder="Kode Promo"
+                        class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 text-sm uppercase focus:outline-none focus:ring-1 focus:ring-black focus:bg-white transition-all">
+                    <button type="button" id="btn-check-voucher"
+                        class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-5 rounded-xl text-sm font-semibold transition-colors">Cek</button>
+                </div>
+                <p id="voucher-message" class="text-xs font-medium h-4"></p>
             </div>
 
-            <div>
-                <label class="text-xs text-gray-500 font-semibold uppercase">Jumlah Tiket</label>
-                <input type="number" name="quantity" value="1" min="1" required class="w-full border border-gray-200 rounded-lg p-3 mt-1 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+            <div class="pt-4 border-t border-gray-100 space-y-2 text-sm">
+                <div class="flex justify-between text-gray-500">
+                    <span>Harga Tiket</span>
+                    <span>Rp 500.000</span>
+                </div>
+                <div class="flex justify-between text-gray-500">
+                    <span>Subtotal</span>
+                    <span>Rp <span id="display-subtotal">500.000</span></span>
+                </div>
+                <div class="flex justify-between text-red-500">
+                    <span>Diskon</span>
+                    <span>- Rp <span id="display-discount">0</span></span>
+                </div>
+                <div class="flex justify-between text-base font-semibold pt-2 text-black">
+                    <span>Total</span>
+                    <span>Rp <span id="display-total">500.000</span></span>
+                </div>
             </div>
 
-            <div>
-                <label class="text-xs text-gray-500 font-semibold uppercase">Kode Promo (Opsional)</label>
-                <input type="text" name="voucher_code" placeholder="Misal: UNTARJUARA" class="w-full border-2 border-dashed border-blue-300 rounded-lg p-3 mt-1 text-blue-700 uppercase focus:outline-none focus:border-blue-500 bg-blue-50/50">
-            </div>
-
-            <button type="submit" class="w-full mt-2 bg-gray-900 hover:bg-black text-white font-semibold py-3.5 rounded-xl transition duration-200 shadow-md">
-                Hitung Total & Beli Tiket
+            <button type="submit"
+                class="w-full bg-black hover:bg-gray-800 text-white font-semibold py-4 rounded-xl text-sm transition-colors mt-4">
+                Lanjut Bayar
             </button>
         </form>
     </div>
 
     @else
-    <div class="w-full max-w-sm bg-white rounded-2xl shadow-lg overflow-hidden relative">
-        <div class="bg-[#2b61ea] p-6 text-white text-center">
-            <p class="text-[10px] font-bold tracking-widest uppercase mb-1.5 text-blue-100">E-Ticket</p>
-            <h2 class="text-xl font-bold leading-snug">Selesaikan<br>Pembayaran Tiketmu</h2>
-        </div>
+    <div class="w-full max-w-sm text-center">
+        <h1 class="text-2xl font-bold mb-2 tracking-tight">Pembayaran</h1>
+        <p class="text-sm text-gray-500 mb-8">Selesaikan pesanan tiket Anda</p>
 
-        <div class="relative flex items-center h-4 bg-white">
-            <div class="absolute -left-3 w-6 h-6 bg-[#f4f4f5] rounded-full shadow-inner"></div>
-            <div class="w-full border-t-2 border-dashed border-gray-200 mx-5"></div>
-            <div class="absolute -right-3 w-6 h-6 bg-[#f4f4f5] rounded-full shadow-inner"></div>
-        </div>
-
-        <div class="p-6 pt-3">
-            <div class="space-y-4">
-                <div class="flex justify-between items-center border-b border-gray-100 pb-3">
-                    <span class="text-sm text-gray-400">Nomor Order</span>
-                    <span class="text-sm font-bold text-gray-800">{{ $order->order_number }}</span>
-                </div>
-                <div class="flex justify-between items-center border-b border-gray-100 pb-3">
-                    <span class="text-sm text-gray-400">Nama Pemesan</span>
-                    <span class="text-sm font-semibold text-gray-800">{{ $order->nama }}</span>
-                </div>
-                <div class="flex justify-between items-center border-b border-gray-100 pb-3">
-                    <span class="text-sm text-gray-400">Jumlah Tiket</span>
-                    <span class="text-sm font-semibold text-gray-800">{{ $order->quantity }} tiket</span>
-                </div>
-                <div class="flex justify-between items-center pt-2">
-                    <span class="text-sm text-gray-400">Total Bayar</span>
-                    <span class="text-lg font-bold text-[#2b61ea]">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
-                </div>
+        <div class="text-left space-y-4 mb-10 text-sm">
+            <div class="flex justify-between border-b border-gray-100 pb-3">
+                <span class="text-gray-500">Order ID</span>
+                <span class="font-medium">{{ $order->order_number }}</span>
             </div>
-
-            <button id="pay-button" class="w-full mt-8 bg-[#2b61ea] hover:bg-blue-700 text-white font-semibold text-sm py-3.5 rounded-xl transition duration-200 shadow-md shadow-blue-500/30">
-                Bayar Sekarang
-            </button>
-
-            <div class="mt-4 flex items-center justify-center gap-1.5 text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-[11px] font-medium tracking-wide">Pembayaran aman via Midtrans</span>
+            <div class="flex justify-between border-b border-gray-100 pb-3">
+                <span class="text-gray-500">Nama</span>
+                <span class="font-medium">{{ $order->nama }}</span>
+            </div>
+            <div class="flex justify-between border-b border-gray-100 pb-3">
+                <span class="text-gray-500">Tiket</span>
+                <span class="font-medium">{{ $order->quantity }}x</span>
+            </div>
+            <div class="flex justify-between pt-2">
+                <span class="font-semibold text-base">Total Bayar</span>
+                <span class="font-bold text-lg">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
             </div>
         </div>
+
+        <button id="pay-button"
+            class="w-full bg-black hover:bg-gray-800 text-white font-semibold py-4 rounded-xl text-sm transition-colors">
+            Bayar Sekarang
+        </button>
     </div>
 
     <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
     <script type="text/javascript">
         document.getElementById('pay-button').onclick = function(){
             snap.pay('{{ $snapToken }}', {
-                onSuccess: function(result){
-                    window.location.href = '/my-orders'; // Redirect ke riwayat pesanan
-                },
-                onPending: function(result){
-                    alert("Menunggu pembayaran Anda!");
-                },
-                onError: function(result){
-                    alert("Pembayaran gagal!");
-                }
+                onSuccess: function(result){ window.location.href = '/my-orders'; },
+                onPending: function(result){ alert("Menunggu pembayaran!"); },
+                onError: function(result){ alert("Pembayaran gagal!"); }
             });
         };
     </script>
     @endif
 
+    <script>
+        const hargaPerTiket = 500000;
+        let currentDiscount = 0;
+
+        const quantityInput = document.getElementById('quantity');
+        const displaySubtotal = document.getElementById('display-subtotal');
+        const displayDiscount = document.getElementById('display-discount');
+        const displayTotal = document.getElementById('display-total');
+        const voucherInput = document.getElementById('voucher_code');
+        const voucherMessage = document.getElementById('voucher-message');
+        const btnCheckVoucher = document.getElementById('btn-check-voucher');
+
+        if (quantityInput) {
+            function calculateTotal() {
+                let qty = parseInt(quantityInput.value) || 1;
+                let subtotal = qty * hargaPerTiket;
+                let total = subtotal - currentDiscount;
+
+                if (total < 1) total = 1;
+
+                displaySubtotal.innerText = subtotal.toLocaleString('id-ID');
+                displayDiscount.innerText = currentDiscount.toLocaleString('id-ID');
+                displayTotal.innerText = total.toLocaleString('id-ID');
+            }
+
+            quantityInput.addEventListener('input', calculateTotal);
+
+            btnCheckVoucher.addEventListener('click', async function() {
+                const code = voucherInput.value.trim();
+
+                if (!code) {
+                    voucherMessage.innerText = "Masukkan kode dulu!";
+                    voucherMessage.className = "text-xs font-medium text-red-500 h-4";
+                    return;
+                }
+
+                voucherMessage.innerText = "Mengecek...";
+                voucherMessage.className = "text-xs font-medium text-gray-500 h-4";
+
+                try {
+                    const response = await fetch('{{ route('check.voucher') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ voucher_code: code })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        currentDiscount = result.discount_amount;
+                        voucherMessage.innerText = result.message;
+                        voucherMessage.className = "text-xs font-medium text-green-600 h-4";
+                    } else {
+                        currentDiscount = 0;
+                        voucherMessage.innerText = result.message;
+                        voucherMessage.className = "text-xs font-medium text-red-500 h-4";
+                    }
+
+                    calculateTotal();
+
+                } catch (error) {
+                    voucherMessage.innerText = "Terjadi kesalahan.";
+                    voucherMessage.className = "text-xs font-medium text-red-500 h-4";
+                }
+            });
+        }
+    </script>
 </body>
 </html>

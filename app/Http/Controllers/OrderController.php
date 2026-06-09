@@ -26,6 +26,7 @@ class OrderController extends Controller
             $voucherCode = trim($request->voucher_code);
             $voucher = Voucher::where('code', $voucherCode)->first();
 
+
             if ($voucher && \Carbon\Carbon::parse($voucher->valid_until)->isFuture() && $voucher->max_usage > 0) {
                 $total_amount = $total_amount - $voucher->discount_amount;
                 $voucherId = $voucher->id;
@@ -36,12 +37,15 @@ class OrderController extends Controller
             $total_amount = 1;
         }
 
+
+
         $order = Order::create([
             'user_id' => 1,
             'order_number' => 'ORD-' . time(),
             'nama' => $request->nama ?? 'Guest',
             'quantity' => $request->quantity ?? 1,
-            'total_amount' => ($request->quantity ?? 1)*500000,
+            'total_amount' => $total_amount,
+            'voucher_id' => isset($voucherId) ? $voucherId : null,
             'status' => 'pending',
         ]);
 
@@ -75,9 +79,6 @@ class OrderController extends Controller
         }
     }
 
-    // Pastikan kamu meng-import Request di bagian atas file jika belum ada:
-// use Illuminate\Http\Request;
-
     public function index(Request $request)
     {
         $sort = $request->query('sort', 'terbaru');
@@ -104,4 +105,27 @@ class OrderController extends Controller
 
     return view('orders.show', compact('order'));
     }
+
+    public function checkVoucher(Request $request)
+{
+    $voucherCode = $request->voucher_code;
+    $voucher = Voucher::where('code', $voucherCode)->first();
+
+    if ($voucher && \Carbon\Carbon::parse($voucher->valid_until)->isFuture() && $voucher->max_usage > 0) {
+        return response()->json([
+            'status' => 'success',
+            'discount_amount' => $voucher->discount_amount,
+            'message' => 'Voucher berhasil digunakan!'
+        ]);
+    }
+
+    return response()->json([
+        'status' => 'error',
+        'discount_amount' => 0,
+        'message' => 'Voucher tidak valid, kadaluarsa, atau kuota habis.'
+    ]);
 }
+
+}
+
+

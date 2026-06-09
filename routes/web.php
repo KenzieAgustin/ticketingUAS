@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\RefundController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -17,4 +19,14 @@ Route::get('/checkout', function () {
     return view('checkout');
 });
 
+Route::post('/check-voucher', [OrderController::class, 'checkVoucher'])->name('check.voucher');
 
+Route::post('/order/{id}/refund', [RefundController::class, 'store'])->name('refund.store');
+Route::get('/admin/refunds', [\App\Http\Controllers\RefundController::class, 'index'])->name('admin.refunds.index');
+Route::post('/admin/refunds/{id}/approve', [\App\Http\Controllers\RefundController::class, 'approve'])->name('admin.refunds.approve');
+Route::post('/admin/refunds/{id}/reject', [\App\Http\Controllers\RefundController::class, 'reject'])->name('admin.refunds.reject');
+
+Route::get('/perbaiki-kolom-status', function () {
+    DB::statement("ALTER TABLE orders MODIFY status VARCHAR(255) DEFAULT 'pending'");
+    return 'Kolom status di tabel orders berhasil diperbaiki! Sekarang bisa nampung refund_pending.';
+});

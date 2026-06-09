@@ -57,5 +57,24 @@
         </a>
     </div>
 
+    @if($order->status == 'paid' || $order->status == 'success')
+    <div class="p-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl mt-4">
+        <h3 class="text-sm font-bold text-gray-800 mb-2 text-center">Ajukan Refund</h3>
+        <form action="{{ route('refund.store', $order->id) }}" method="POST" class="flex flex-col gap-2">
+            @csrf
+            <textarea name="reason" rows="2" required placeholder="Tuliskan alasan refund..."
+                class="w-full border border-gray-300 rounded-lg p-2 text-xs focus:outline-none focus:border-blue-500"></textarea>
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-lg text-xs transition-colors">
+                Kirim Pengajuan
+            </button>
+        </form>
+    </div>
+
+@elseif($order->status == 'refund_pending')
+    <div class="p-4 border-t border-gray-100 bg-orange-50 rounded-b-2xl mt-4 text-center">
+        <p class="text-xs text-orange-600 font-bold">⏳ Pengajuan refund sedang direview Admin</p>
+    </div>
+@endif
+
 </body>
 </html>
