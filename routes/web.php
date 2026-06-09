@@ -6,6 +6,7 @@ use App\Http\Controllers\TicketZoneController;
 use App\Http\Controllers\WaitListController;
 use App\Http\Controllers\TicketTokenController;
 use App\Http\Controllers\PricingRuleController;
+use App\Http\Controllers\QuotaTrackerController;
 
 //masih redirect ke tiket karena belum ada login 
 Route::get('/', function () {
@@ -32,3 +33,5 @@ Route::post('/waitlist/join', [WaitListController::class, 'joinWaitList']);
 Route::post('/tokens/generate', [TicketTokenController::class, 'generateToken']);
 
 Route::get('/admin/tickets', [TicketController::class, 'adminWeb']);
+
+Route::get('/tracker', [QuotaTrackerController::class, 'indexWeb']);
