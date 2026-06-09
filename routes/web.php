@@ -24,6 +24,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [UserController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password');
+
+
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/',             [NotificationController::class, 'index'])->name('index');
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread');
+        Route::patch('/{id}/read',  [NotificationController::class, 'markAsRead'])->name('read');
+        Route::patch('/read-all',   [NotificationController::class, 'markAllRead'])->name('read-all');
+        Route::delete('/{id}',      [NotificationController::class, 'destroy'])->name('destroy');
+    });
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
