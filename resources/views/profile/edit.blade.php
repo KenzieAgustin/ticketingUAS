@@ -33,6 +33,9 @@
         <label>No. HP:</label><br>
         <input type="text" name="phone" value="{{ old('phone', $user->phone) }}"><br><br>
 
+        <label>Alamat:</label><br>
+        <input type="text" name="address" value="{{ old('address', $user->address) }}"><br><br>
+
         <label>Avatar:</label><br>
         @if($user->avatar_url)
             <img src="{{ $user->avatar_url }}" alt="Avatar" width="60"><br>

@@ -27,7 +27,7 @@ class UserController extends Controller
     public function update(UpdateProfileRequest $request)
     {
         $user = Auth::user();
-        $data = $request->only('name', 'email', 'phone');
+        $data = $request->only('name', 'email', 'phone', 'address');
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar) {

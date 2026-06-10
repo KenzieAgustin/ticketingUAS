@@ -14,6 +14,7 @@
     <p><strong>Nama:</strong> {{ $user->name }}</p>
     <p><strong>Email:</strong> {{ $user->email }}</p>
     <p><strong>No. HP:</strong> {{ $user->phone ?? '-' }}</p>
+    <p><strong>Alamat:</strong> {{ $user->address ?? '-' }}</p>
 
     <br>
     <a href="{{ route('profile.edit') }}">Edit Profil</a> |
