@@ -23,6 +23,16 @@ class PaymentController extends Controller
                 if ($request->transaction_status == 'capture' || $request->transaction_status == 'settlement') {
                     $order->update(['status' => 'paid']);
 
+                    $user = \App\Models\User::find($order->user_id);
+
+                    if ($user) {
+                        $pointsEarned = floor($order->total_amount / 100000) * 10;
+
+                        if ($pointsEarned > 0) {
+                            $user->increment('points', $pointsEarned);
+                        }
+                    }
+
                     Payment::updateOrCreate(
                         ['order_id' => $order->id],
                         [

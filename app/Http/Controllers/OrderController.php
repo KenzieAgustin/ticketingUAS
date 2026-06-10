@@ -107,7 +107,7 @@ class OrderController extends Controller
     }
 
     public function checkVoucher(Request $request)
-{
+    {
     $voucherCode = $request->voucher_code;
     $voucher = Voucher::where('code', $voucherCode)->first();
 
@@ -124,7 +124,9 @@ class OrderController extends Controller
         'discount_amount' => 0,
         'message' => 'Voucher tidak valid, kadaluarsa, atau kuota habis.'
     ]);
-}
+    }
+
+
 
 }
 

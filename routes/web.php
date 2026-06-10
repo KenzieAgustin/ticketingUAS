@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RefundController;
+use App\Http\Controllers\RedeemController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -30,3 +31,9 @@ Route::get('/perbaiki-kolom-status', function () {
     DB::statement("ALTER TABLE orders MODIFY status VARCHAR(255) DEFAULT 'pending'");
     return 'Kolom status di tabel orders berhasil diperbaiki! Sekarang bisa nampung refund_pending.';
 });
+
+
+Route::get('/points', [RedeemController::class, 'myPoints']);
+Route::post('/redeem', [RedeemController::class, 'redeem']);
+
+
