@@ -1,10 +1,16 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\NotificationController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Web\StageWebController;
+use App\Http\Controllers\Web\EventCategoryWebController;
+use App\Http\Controllers\Web\EventWebController;
+use App\Http\Controllers\Web\PerformerWebController;
+use App\Http\Controllers\Web\EventScheduleWebController;
+use App\Http\Controllers\Web\EventMediaWebController;
 
 Route::get('/', fn() => redirect()->route('login'));
 
@@ -44,3 +50,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:admin,staff_gate'])->prefix('staff')->name('staff.')->group(function () {
     // fitur untuk staff gate
 });
+
+Route::resource('stages', StageWebController::class)->names('web.stages');
+Route::resource('event-categories', EventCategoryWebController::class)->names('web.event-categories');
+Route::resource('events', EventWebController::class)->names('web.events');
+Route::resource('performers', PerformerWebController::class)->names('web.performers');
+Route::resource('event-schedules', EventScheduleWebController::class)->names('web.event-schedules');
+Route::resource('event-media', EventMediaWebController::class)->names('web.event-media');
