@@ -136,7 +136,7 @@
 
             
             <div class="top-header">
-                🎪 PRJ — Pekan Raya Jakarta · Event & Konser Management
+                °❀⋆.ೃ࿔* PRJ - Pekan Raya Jakarta · Event & Konser Management °❀⋆.ೃ࿔*
             </div>
 
             <div class="main-content">
