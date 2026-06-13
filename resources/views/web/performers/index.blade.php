@@ -2,7 +2,9 @@
 @section('content')
 <div class="page-header">
     <h4><i class="bi bi-music-note-beamed"></i> Daftar Performer</h4>
-    <a href="{{ route('web.performers.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Tambah Performer</a>
+    @if(auth()->check() && auth()->user()->isAdmin())
+        <a href="{{ route('web.performers.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Tambah Performer</a>
+    @endif
 </div>
 <div class="card shadow-sm">
     <div class="card-body">
@@ -11,7 +13,10 @@
         @else
         <table class="table table-hover align-middle">
             <thead class="table-dark">
-                <tr><th>#</th><th>Nama</th><th>Genre</th><th>Event</th><th>Aksi</th></tr>
+                <tr>
+                    <th>#</th><th>Nama</th><th>Genre</th><th>Event</th>
+                    @if(auth()->check() && auth()->user()->isAdmin()) <th>Aksi</th> @endif
+                </tr>
             </thead>
             <tbody>
                 @foreach($performers as $i => $performer)
@@ -20,6 +25,7 @@
                     <td><strong>{{ $performer->name }}</strong></td>
                     <td>{{ $performer->genre ?? '-' }}</td>
                     <td>{{ $performer->event->name ?? '-' }}</td>
+                    @if(auth()->check() && auth()->user()->isAdmin())
                     <td>
                         <a href="{{ route('web.performers.show', $performer->id) }}" class="btn btn-sm btn-info text-white"><i class="bi bi-eye"></i></a>
                         <a href="{{ route('web.performers.edit', $performer->id) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
@@ -28,6 +34,7 @@
                             <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
                         </form>
                     </td>
+                    @endif
                 </tr>
                 @endforeach
             </tbody>
