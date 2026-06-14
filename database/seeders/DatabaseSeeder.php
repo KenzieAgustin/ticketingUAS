@@ -11,5 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             TicketSeeder::class,
         ]);
+
+        $this->call(GateSeeder::class);
     }
 }
