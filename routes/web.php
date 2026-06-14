@@ -11,39 +11,56 @@ use App\Http\Controllers\Web\EventWebController;
 use App\Http\Controllers\Web\PerformerWebController;
 use App\Http\Controllers\Web\EventScheduleWebController;
 use App\Http\Controllers\Web\EventMediaWebController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GateController;
+use App\Http\Controllers\StaffAssignmentController;
+use App\Http\Controllers\CheckInController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SalesReportController;
 
 Route::get('/', fn() => redirect()->route('login'));
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
-
+  
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 });
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
+  
     Route::get('/home', fn() => view('home'))->name('home');
-
+  
     Route::get('/profile', [UserController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [UserController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password');
 
-
     Route::prefix('notifications')->name('notifications.')->group(function () {
-        Route::get('/',             [NotificationController::class, 'index'])->name('index');
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
         Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread');
-        Route::patch('/{id}/read',  [NotificationController::class, 'markAsRead'])->name('read');
-        Route::patch('/read-all',   [NotificationController::class, 'markAllRead'])->name('read-all');
-        Route::delete('/{id}',      [NotificationController::class, 'destroy'])->name('destroy');
+        Route::patch('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
+        Route::patch('/read-all', [NotificationController::class, 'markAllRead'])->name('read-all');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
     });
+
+    // Operational & Report
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/sales-report', [SalesReportController::class, 'index'])->name('sales-report.index');
+    Route::resource('gates', GateController::class)->except(['create', 'edit']);
+    Route::resource('staff-assignments', StaffAssignmentController::class)->except(['create', 'edit', 'show']);
+    Route::patch('/staff-assignments/{staffAssignment}/status', [StaffAssignmentController::class, 'updateStatus'])->name('staff-assignments.updateStatus');
+    Route::get('/check-ins', [CheckInController::class, 'index'])->name('check-ins.index');
+    Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan');
+    Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('reviews.index');
+    Route::patch('/reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::patch('/reviews/{review}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard',          [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::patch('/users/{user}/role', [AdminController::class, 'updateRole'])->name('role.update');
 });
 
