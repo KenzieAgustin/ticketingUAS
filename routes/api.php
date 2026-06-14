@@ -1,15 +1,26 @@
 <?php
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\EventCategoryController;
+use App\Http\Controllers\Api\StageController;
+use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\PerformerController;
+use App\Http\Controllers\Api\EventScheduleController;
+use App\Http\Controllers\Api\EventMediaController;
 use App\Http\Controllers\GateController;
 use App\Http\Controllers\StaffAssignmentController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\DashboardController;
 
+Route::apiResource('event-categories', EventCategoryController::class);
+Route::apiResource('stages', StageController::class);
+Route::apiResource('events', EventController::class);
+Route::apiResource('performers', PerformerController::class);
+Route::apiResource('event-schedules', EventScheduleController::class);
+Route::apiResource('event-media', EventMediaController::class);
 
-
+//Operational & Report
 Route::middleware(['auth:sanctum'])->group(function () {
     // Gates
     Route::get('/gates', [GateController::class, 'index']); // lihat semua gate
