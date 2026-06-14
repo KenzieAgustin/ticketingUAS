@@ -5,15 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GateRequest;
 use App\Models\Gate;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class GateController extends Controller
 {
-    /**
-     * GET /api/gates
-     */
-    public function index(Request $request): JsonResponse
+    // GET /gates
+    public function index(Request $request)
     {
         $gates = Gate::query()
             ->when($request->type,   fn ($q) => $q->where('type', $request->type))
@@ -22,57 +19,38 @@ class GateController extends Controller
             ->orderBy('code')
             ->get();
 
-        return response()->json(['success' => true, 'data' => $gates]);
+        return view('gates.index', compact('gates'));
     }
 
-    /**
-     * POST /api/gates
-     */
-    public function store(GateRequest $request): JsonResponse
+    // POST /gates
+    public function store(GateRequest $request)
     {
-        $gate = Gate::create($request->validated());
+        Gate::create($request->validated());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Gate berhasil dibuat.',
-            'data'    => $gate,
-        ], 201);
+        return redirect()->route('gates.index')->with('success', 'Gate berhasil dibuat.');
     }
 
-    /**
-     * GET /api/gates/{gate}
-     */
-    public function show(Gate $gate): JsonResponse
+    // GET /gates/{gate}
+    public function show(Gate $gate)
     {
-        $gate->load(['staffAssignments.staff', 'checkIns' => fn ($q) => $q->today()->latest()]);
+        $gate->load(['staffAssignments.staff', 'checkIns' => fn ($q) => $q->latest()]);
 
-        return response()->json(['success' => true, 'data' => $gate]);
+        return view('gates.show', compact('gate'));
     }
 
-    /**
-     * PUT /api/gates/{gate}
-     */
-    public function update(GateRequest $request, Gate $gate): JsonResponse
+    // PUT /gates/{gate}
+    public function update(GateRequest $request, Gate $gate)
     {
         $gate->update($request->validated());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Gate berhasil diperbarui.',
-            'data'    => $gate,
-        ]);
+        return redirect()->route('gates.index')->with('success', 'Gate berhasil diperbarui.');
     }
 
-    /**
-     * DELETE /api/gates/{gate}
-     */
-    public function destroy(Gate $gate): JsonResponse
+    // DELETE /gates/{gate}
+    public function destroy(Gate $gate)
     {
         $gate->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Gate berhasil dihapus.',
-        ]);
+        return redirect()->route('gates.index')->with('success', 'Gate berhasil dihapus.');
     }
 }

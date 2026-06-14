@@ -7,12 +7,6 @@ use Illuminate\Support\Facades\Cache;
 
 class DashboardService
 {
-    /**
-     * Statistik utama dashboard (di-cache 5 menit).
-     * Disesuaikan dengan struktur Nicho:
-     * - order_items tidak punya event_id, join lewat ticket_types
-     * - total_amount ada di tabel orders
-     */
     public function getSummary(?int $eventId = null): array
     {
         $cacheKey = 'dashboard_summary_' . ($eventId ?? 'all');
@@ -30,7 +24,6 @@ class DashboardService
     }
 
     // Rekap penjualan per ticket_type per hari.
-
     public function getSalesReport(array $filters = []): array
     {
         $query = DB::table('order_items as oi')
@@ -74,9 +67,7 @@ class DashboardService
         ];
     }
 
-    /**
-     * Rekap check-in per gate per hari.
-     */
+    // Rekap check-in per gate per hari.
     public function getCheckInReport(int $eventId, ?string $date = null): array
     {
         $query = DB::table('check_ins as ci')
@@ -107,7 +98,7 @@ class DashboardService
         ];
     }
 
-    // ── Private helpers ───────────────────────────────────────────────────────
+    // private function totalVisitors(int $eventId): int
 
     private function totalVisitors(?int $eventId): int
     {

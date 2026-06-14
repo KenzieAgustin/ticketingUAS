@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('check_ins', function (Blueprint $table) {
             $table->id();
             $table->string('booking_code')->index();
-            $table->unsignedBigInteger('ticket_token_id');
-            $table->unsignedBigInteger('order_item_id');
+            $table->unsignedBigInteger('ticket_token_id')->nullable();
+            $table->unsignedBigInteger('order_item_id')->nullable();
             $table->unsignedBigInteger('gate_id');
             $table->unsignedBigInteger('checked_by');
             $table->enum('method', ['qr_scan', 'manual_code'])->default('qr_scan');

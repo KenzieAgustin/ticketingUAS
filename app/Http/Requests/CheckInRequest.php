@@ -7,20 +7,13 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CheckInRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         // Hanya staff_gate & admin yang melakukan scan
-        return $this->user()->hasRole(['staff_gate', 'admin']);
+        // return $this->user()->hasRole(['staff_gate', 'admin']);
+        return true; // Sementara diizinkan semua untuk testing
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [

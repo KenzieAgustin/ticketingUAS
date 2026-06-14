@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('staff_assignments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('staff_id');
+            $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('gate_id');
-            $table->unsignedBigInteger('event_id');
+            $table->unsignedBigInteger('event_id')->nullable();
             $table->date('assignment_date');
             $table->enum('shift', ['morning', 'afternoon', 'evening', 'full_day']);
             $table->time('shift_start');

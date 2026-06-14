@@ -8,14 +8,11 @@ use Illuminate\Support\Facades\DB;
 
 class CheckInService
 {
-    /**
-     * Proses scan tiket (QR atau kode manual).
-     * - kolom: booking_code, status ('valid'/'used'), order_item_id, qr_code_path
-     */
+    // Proses scan tiket (QR atau kode manual).
     public function process(
         string $bookingCode,
         int    $gateId,
-        int    $staffId,
+        ?int    $staffId,
         string $method = 'qr_scan'
     ): array {
         return DB::transaction(function () use ($bookingCode, $gateId, $staffId, $method) {

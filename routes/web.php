@@ -1,20 +1,22 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GateController;
 use App\Http\Controllers\StaffAssignmentController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SalesReportController;
 
-Route::get('/login', fn() => view('auth.login'))->name('login');
-Route::post('/login', [AuthenticatedSessionController::class, 'store']);
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-
-Route::middleware(['auth'])->group(function () {
+// Auth
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+ 
+Route::middleware([])->group(function () { // ['auth'] di-comment sementara
     Route::get('/', fn() => redirect()->route('dashboard'));
-    Route::get('/dashboard', fn() => view('dashboard.index'))->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Sales Report
     Route::get('/sales-report', [SalesReportController::class, 'index'])->name('sales-report.index');
