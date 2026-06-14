@@ -8,11 +8,6 @@ use App\Http\Controllers\StaffAssignmentController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SalesReportController;
-
-// Auth
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
  
 Route::middleware([])->group(function () { // ['auth'] di-comment sementara
     Route::get('/', fn() => redirect()->route('dashboard'));
