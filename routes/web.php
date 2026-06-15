@@ -97,8 +97,10 @@ Route::middleware('auth')->group(function () {
 
 // Admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // User management
     Route::get('/users', [AdminController::class, 'index'])->name('users.index');
     Route::patch('/users/{user}/role', [AdminController::class, 'updateRole'])->name('role.update');
+    Route::get('/activities', [AdminController::class, 'activities'])->name('activities.index');
 
     // Ticket admin
     Route::get('/tickets', [TicketController::class, 'adminWeb']);
