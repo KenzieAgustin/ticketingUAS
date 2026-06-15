@@ -23,6 +23,7 @@
         
         @if(Auth::user()->isAdmin())
             <a href="{{ route('admin.users.index') }}">Kelola User</a> |
+            <a href="{{ route('admin.activities.index') }}">Aktivitas User</a> |
         @endif
 
         <form method="POST" action="{{ route('logout') }}" style="display:inline">
