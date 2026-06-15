@@ -22,7 +22,7 @@
         </a> |
         
         @if(Auth::user()->isAdmin())
-            <a href="{{ route('admin.dashboard') }}">Admin Dashboard</a> |
+            <a href="{{ route('admin.users.index') }}">Kelola User</a> |
         @endif
 
         <form method="POST" action="{{ route('logout') }}" style="display:inline">

@@ -1,10 +1,10 @@
 <html>
 <head>
-    <title>Admin Dashboard</title>
+    <title>Kelola User</title>
 </head>
 <body>
 
-<h2>Admin Dashboard</h2>
+<h2>Kelola User</h2>
 
 @if (session('success'))
     <div>{{ session('success') }}</div><br>
@@ -12,7 +12,7 @@
 
 <nav>
     <a href="{{ route('home') }}">Home</a> |
-    <a href="{{ route('admin.dashboard') }}">Admin Dashboard</a> |
+    <a href="{{ route('admin.users.index') }}">Kelola User</a> |
     <a href="{{ route('profile.show') }}">Profil</a> |
     <form method="POST" action="{{ route('logout') }}" style="display:inline">
         @csrf
