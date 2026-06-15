@@ -81,3 +81,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/dashboard/sales-report', [DashboardController::class, 'salesReport']); // Rekap penjualan per event, tipe tiket, dan hari
     });
 });
+});
