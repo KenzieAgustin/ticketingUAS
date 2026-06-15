@@ -35,6 +35,7 @@ Route::post('/payment-callback', [PaymentController::class, 'webhook']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/points', [RedeemController::class, 'myPoints']);
     Route::post('/redeem', [RedeemController::class, 'redeem']);
+});
 
 //Operational & Report
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -81,3 +82,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/dashboard/sales-report', [DashboardController::class, 'salesReport']); // Rekap penjualan per event, tipe tiket, dan hari
     });
 });
+
