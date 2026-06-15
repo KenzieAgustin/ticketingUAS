@@ -108,6 +108,7 @@ class OrderController extends Controller
 
     public function checkVoucher(Request $request)
     {
+<<<<<<< HEAD
     $voucherCode = $request->voucher_code;
     $voucher = Voucher::where('code', $voucherCode)->first();
 
@@ -118,6 +119,31 @@ class OrderController extends Controller
             'message' => 'Voucher berhasil digunakan!'
         ]);
     }
+=======
+        $voucherCode = $request->voucher_code;
+        $voucher = Voucher::where('code', $voucherCode)->first();
+
+        if ($voucher) {
+            $isValidUntil = $voucher->valid_until
+                ? \Carbon\Carbon::parse($voucher->valid_until)->isFuture()
+                : true;
+
+            $isExpiredAt = $voucher->expired_at
+                ? \Carbon\Carbon::parse($voucher->expired_at)->isFuture()
+                : true;
+
+            $isQuotaAvailable = ($voucher->max_usage > 0) ||
+                                ($voucher->quota !== null && $voucher->used < $voucher->quota);
+
+            if (($isValidUntil || $isExpiredAt) && $isQuotaAvailable) {
+                return response()->json([
+                    'status' => 'success',
+                    'discount_amount' => $voucher->discount_amount,
+                    'message' => 'Voucher berhasil digunakan!'
+                ]);
+            }
+        }
+>>>>>>> 6769032 (progress order-redeem controller)
 
     return response()->json([
         'status' => 'error',
@@ -126,8 +152,11 @@ class OrderController extends Controller
     ]);
     }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 6769032 (progress order-redeem controller)
 }
 
 

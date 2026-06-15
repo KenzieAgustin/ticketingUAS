@@ -24,6 +24,7 @@ Route::apiResource('event-schedules', EventScheduleController::class);
 Route::apiResource('event-media', EventMediaController::class);
 
 // Order payment
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -34,7 +35,7 @@ Route::post('/payment-callback', [PaymentController::class, 'webhook']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/points', [RedeemController::class, 'myPoints']);
     Route::post('/redeem', [RedeemController::class, 'redeem']);
-  
+
 //Operational & Report
 Route::middleware(['auth:sanctum'])->group(function () {
     // Gates
