@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\OrderController;
@@ -121,7 +122,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 Route::middleware(['auth', 'role:admin,staff_gate'])->prefix('staff')->name('staff.')->group(function () {
-    // fitur untuk staff gate
+   
 });
 
 Route::resource('stages', StageWebController::class)->names('web.stages');
