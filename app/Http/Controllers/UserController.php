@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\UserActivity;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\UpdatePasswordRequest;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +38,12 @@ class UserController extends Controller
         }
 
         $user->update($data);
+    
+        UserActivity::create([
+            'user_id'    => Auth::id(),
+            'action'     => 'update_profile',
+            'ip_address' => $request->ip(),
+        ]);
 
         return back()->with('success', 'Profil berhasil diperbarui.');
     }
@@ -52,6 +58,12 @@ class UserController extends Controller
 
         $user->update([
             'password' => Hash::make($request->password),
+        ]);
+
+        UserActivity::create([
+            'user_id'    => Auth::id(),
+            'action'     => 'change_password',
+            'ip_address' => $request->ip(),
         ]);
 
         Auth::logout();
