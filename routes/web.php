@@ -140,16 +140,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('reviews.index');
     Route::patch('/reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
     Route::patch('/reviews/{review}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
-  
+
 });
 
 // Staff gate
 Route::middleware(['auth', 'role:admin,staff_gate'])->prefix('staff')->name('staff.')->group(function () {
     // Ticket & Token module
     Route::get('/scan', [TicketTokenController::class, 'scanWeb']);
-  
+
     Route::get('/gates', [GateController::class, 'staffIndex'])->name('gates.index');
     Route::get('/check-ins/scan', [CheckInController::class, 'staffScan'])->name('check-ins.scan');
     Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan.post');
-   
+
 });
