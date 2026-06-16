@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [UserController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [UserController::class, 'update'])->name('profile.update');
+    Route::get('/profile/password', [UserController::class, 'showPassword'])->name('profile.password.show');
     Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password');
 
     // Notifications
@@ -97,8 +98,10 @@ Route::middleware('auth')->group(function () {
 
 // Admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // User management
     Route::get('/users', [AdminController::class, 'index'])->name('users.index');
     Route::patch('/users/{user}/role', [AdminController::class, 'updateRole'])->name('role.update');
+    Route::get('/activities', [AdminController::class, 'activities'])->name('activities.index');
 
     // Ticket admin
     Route::get('/tickets', [TicketController::class, 'adminWeb']);
