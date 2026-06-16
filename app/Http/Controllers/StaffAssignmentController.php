@@ -23,8 +23,10 @@ class StaffAssignmentController extends Controller
             ->paginate(30);
 
         $gates = Gate::orderBy('name')->get();
+        $staffs = \App\Models\User::where('role', 'staff_gate')->orderBy('name')->get();
+        $events = \App\Models\Event::orderBy('name')->get();
 
-        return view('staff-assignments.index', compact('assignments', 'gates'));
+        return view('admin.staff-assignments.index', compact('assignments', 'gates', 'staffs', 'events'));
     }
 
     // POST /staff-assignments
@@ -32,7 +34,7 @@ class StaffAssignmentController extends Controller
     {
         StaffAssignment::create($request->validated());
 
-        return redirect()->route('staff-assignments.index')->with('success', 'Jadwal staff berhasil dibuat.');
+        return redirect()->route('admin.staff-assignments.index')->with('success', 'Jadwal staff berhasil dibuat.');
     }
 
     // DELETE /staff-assignments/{assignment}
@@ -40,7 +42,7 @@ class StaffAssignmentController extends Controller
     {
         $staffAssignment->delete();
 
-        return redirect()->route('staff-assignments.index')->with('success', 'Jadwal berhasil dihapus.');
+        return redirect()->route('admin.staff-assignments.index')->with('success', 'Jadwal berhasil dihapus.');
     }
 
     // PATCH /staff-assignments/{assignment}/status
@@ -56,6 +58,6 @@ class StaffAssignmentController extends Controller
             'notes'  => $request->notes ?? $staffAssignment->notes,
         ]);
 
-        return redirect()->route('staff-assignments.index')->with('success', 'Status kehadiran diperbarui.');
+        return redirect()->route('admin.staff-assignments.index')->with('success', 'Status kehadiran diperbarui.');
     }
 }

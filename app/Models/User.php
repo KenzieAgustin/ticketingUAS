@@ -78,4 +78,9 @@ class User extends Authenticatable
     {
         return in_array($this->role, (array) $roles);
     }
+
+    public function activities()
+    {
+        return $this->hasMany(UserActivity::class);
+    }
 }

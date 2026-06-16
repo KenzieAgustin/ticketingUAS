@@ -29,53 +29,30 @@ use App\Http\Controllers\TicketTokenController;
 use App\Http\Controllers\PricingRuleController;
 use App\Http\Controllers\QuotaTrackerController;
 
+// Root
 Route::get('/', fn() => redirect()->route('login'));
 
+// Guest
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
-
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
 });
 
-Route::get('/my-orders', [OrderController::class, 'index'])->name('order.index');
-Route::get('/my-orders/{id}', [OrderController::class, 'show'])->name('order.show');
-
-
-Route::post('/checkout', [App\Http\Controllers\OrderController::class, 'checkout']);
-
-Route::get('/checkout', function () {
-    return view('checkout');
-});
-
-Route::post('/check-voucher', [OrderController::class, 'checkVoucher'])->name('check.voucher');
-
-Route::post('/order/{id}/refund', [RefundController::class, 'store'])->name('refund.store');
-Route::get('/admin/refunds', [\App\Http\Controllers\RefundController::class, 'index'])->name('admin.refunds.index');
-Route::post('/admin/refunds/{id}/approve', [\App\Http\Controllers\RefundController::class, 'approve'])->name('admin.refunds.approve');
-Route::post('/admin/refunds/{id}/reject', [\App\Http\Controllers\RefundController::class, 'reject'])->name('admin.refunds.reject');
-
-Route::get('/perbaiki-kolom-status', function () {
-    DB::statement("ALTER TABLE orders MODIFY status VARCHAR(255) DEFAULT 'pending'");
-    return 'Kolom status di tabel orders berhasil diperbaiki! Sekarang bisa nampung refund_pending.';
-});
-
-
-Route::get('/points', [RedeemController::class, 'myPoints']);
-Route::post('/redeem', [RedeemController::class, 'redeem']);
-
-
+// Auth
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
     Route::get('/home', fn() => view('home'))->name('home');
 
+    // Profile
     Route::get('/profile', [UserController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [UserController::class, 'update'])->name('profile.update');
+    Route::get('/profile/password', [UserController::class, 'showPassword'])->name('profile.password.show');
     Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password');
 
+    // Notifications
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
         Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread');
@@ -84,50 +61,95 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
     });
 
-    // Operational & Report
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/sales-report', [SalesReportController::class, 'index'])->name('sales-report.index');
-    Route::resource('gates', GateController::class)->except(['create', 'edit']);
-    Route::resource('staff-assignments', StaffAssignmentController::class)->except(['create', 'edit', 'show']);
-    Route::patch('/staff-assignments/{staffAssignment}/status', [StaffAssignmentController::class, 'updateStatus'])->name('staff-assignments.updateStatus');
-    Route::get('/check-ins', [CheckInController::class, 'index'])->name('check-ins.index');
-    Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan');
-    Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('reviews.index');
-    Route::patch('/reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
-    Route::patch('/reviews/{review}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
-
     // Ticket & Token module
     Route::get('/tickets', [TicketController::class, 'indexWeb']);
     Route::post('/tickets', [TicketController::class, 'store']);
     Route::get('/tickets/{id}/buy', [TicketController::class, 'buyWeb']);
-
-    Route::get('/scan', [TicketTokenController::class, 'scanWeb']);
     Route::post('/tokens/validate', [TicketTokenController::class, 'validateToken']);
     Route::post('/tokens/generate', [TicketTokenController::class, 'generateToken']);
-
     Route::get('/zones/{ticket_id}', [TicketZoneController::class, 'getZoneByTicket']);
     Route::post('/zones/reduce', [TicketZoneController::class, 'reduceQuota']);
-
     Route::get('/tickets/{id}/calculate-price', [PricingRuleController::class, 'calculateFinalPrice']);
-
     Route::post('/waitlist/join', [WaitListController::class, 'joinWaitList']);
 
-    Route::get('/admin/tickets', [TicketController::class, 'adminWeb']);
-    Route::get('/tracker', [QuotaTrackerController::class, 'indexWeb']);
+    // Order payment
+    Route::get('/my-orders', [OrderController::class, 'index'])->name('order.index');
+    Route::get('/my-orders/{id}', [OrderController::class, 'show'])->name('order.show');
+    Route::post('/checkout', [OrderController::class, 'checkout']);
+    Route::get('/checkout', fn() => view('checkout'));
+    Route::post('/check-voucher', [OrderController::class, 'checkVoucher'])->name('check.voucher');
+    Route::post('/order/{id}/refund', [RefundController::class, 'store'])->name('refund.store');
+    Route::get('/points', [RedeemController::class, 'myPoints']);
+    Route::post('/redeem', [RedeemController::class, 'redeem']);
+
+    // Event & Konser
+    Route::resource('stages', StageWebController::class)->names('web.stages');
+    Route::resource('event-categories', EventCategoryWebController::class)->names('web.event-categories');
+    Route::resource('events', EventWebController::class)->names('web.events');
+    Route::resource('performers', PerformerWebController::class)->names('web.performers');
+    Route::resource('event-schedules', EventScheduleWebController::class)->names('web.event-schedules');
+    Route::resource('event-media', EventMediaWebController::class)->names('web.event-media');
+
+    // Operational & Report
+    Route::get('/gates', [GateController::class, 'index']);
+    Route::post('/reviews', [ReviewController::class, 'store']);
+    Route::get('/reviews', [ReviewController::class, 'index']);
 });
 
+// Admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    // User management
+    Route::get('/users', [AdminController::class, 'index'])->name('users.index');
     Route::patch('/users/{user}/role', [AdminController::class, 'updateRole'])->name('role.update');
+    Route::get('/activities', [AdminController::class, 'activities'])->name('activities.index');
+
+    // Ticket admin
+    Route::get('/tickets', [TicketController::class, 'adminWeb']);
+    Route::get('/tracker', [QuotaTrackerController::class, 'indexWeb']);
+
+    // Refund
+    Route::get('/refunds', [RefundController::class, 'index'])->name('refunds.index');
+    Route::post('/refunds/{id}/approve', [RefundController::class, 'approve'])->name('refunds.approve');
+    Route::post('/refunds/{id}/reject', [RefundController::class, 'reject'])->name('refunds.reject');
+
+    // Operational & Report
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/summary', [DashboardController::class, 'summary']);
+    Route::get('/sales-report', [SalesReportController::class, 'index'])->name('sales-report.index');
+    Route::get('/operational', [DashboardController::class, 'index'])->name('operational');
+
+    // Gates
+    Route::get('/gates', [GateController::class, 'index'])->name('gates.index');
+    Route::post('/gates', [GateController::class, 'store']);
+    Route::put('/gates/{gate}', [GateController::class, 'update']);
+    Route::delete('/gates/{gate}', [GateController::class, 'destroy']);
+    Route::resource('gates', GateController::class)->except(['create', 'edit']);
+
+    // Staff assignment
+    Route::get('/staff-assignments', [StaffAssignmentController::class, 'index'])->name('staff-assignments.index');
+    Route::post('/staff-assignments', [StaffAssignmentController::class, 'store']);
+    Route::delete('/staff-assignments/{staffAssignment}', [StaffAssignmentController::class, 'destroy']);
+    Route::patch('/staff-assignments/{staffAssignment}/status', [StaffAssignmentController::class, 'updateStatus'])->name('staff-assignments.updateStatus');
+    Route::resource('staff-assignments', StaffAssignmentController::class)->except(['create', 'edit', 'show']);
+
+    // Check-ins
+    Route::get('/check-ins', [CheckInController::class, 'index'])->name('check-ins.index');
+    Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan');
+
+    // Reviews
+    Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('reviews.index');
+    Route::patch('/reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::patch('/reviews/{review}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
+
 });
 
+// Staff gate
 Route::middleware(['auth', 'role:admin,staff_gate'])->prefix('staff')->name('staff.')->group(function () {
+    // Ticket & Token module
+    Route::get('/scan', [TicketTokenController::class, 'scanWeb']);
+
+    Route::get('/gates', [GateController::class, 'staffIndex'])->name('gates.index');
+    Route::get('/check-ins/scan', [CheckInController::class, 'staffScan'])->name('check-ins.scan');
+    Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan.post');
 
 });
-
-Route::resource('stages', StageWebController::class)->names('web.stages');
-Route::resource('event-categories', EventCategoryWebController::class)->names('web.event-categories');
-Route::resource('events', EventWebController::class)->names('web.events');
-Route::resource('performers', PerformerWebController::class)->names('web.performers');
-Route::resource('event-schedules', EventScheduleWebController::class)->names('web.event-schedules');
-Route::resource('event-media', EventMediaWebController::class)->names('web.event-media');

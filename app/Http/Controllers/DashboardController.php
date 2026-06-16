@@ -32,7 +32,7 @@ class DashboardController extends Controller
             ->orderBy('code')
             ->get();
  
-        return view('dashboard.index', compact(
+        return view('admin.dashboard.index', compact(
             'totalGates', 'activeGates', 'todayCheckIns', 'successRate',
             'activeStaff', 'totalAssignments', 'pendingReviews',
             'recentCheckIns', 'gateStatus'

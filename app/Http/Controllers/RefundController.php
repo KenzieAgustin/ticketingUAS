@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
 use App\Models\Refund;
 
@@ -18,7 +19,7 @@ class RefundController extends Controller
 
         Refund::create([
             'order_id' => $order->id,
-            'user_id' => 1,
+            'user_id' => Auth::id(),
             'reason' => $request->reason,
             'status' => 'pending'
         ]);

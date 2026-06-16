@@ -19,7 +19,7 @@ class GateController extends Controller
             ->orderBy('code')
             ->get();
 
-        return view('gates.index', compact('gates'));
+        return view('admin.gates.index', compact('gates'));
     }
 
     // POST /gates
@@ -35,7 +35,7 @@ class GateController extends Controller
     {
         $gate->load(['staffAssignments.staff', 'checkIns' => fn ($q) => $q->latest()]);
 
-        return view('gates.show', compact('gate'));
+        return view('admin.gates.show', compact('gate'));
     }
 
     // PUT /gates/{gate}
@@ -52,5 +52,12 @@ class GateController extends Controller
         $gate->delete();
 
         return redirect()->route('gates.index')->with('success', 'Gate berhasil dihapus.');
+    }
+
+    // GET /staff/gates
+    public function staffIndex()
+    {
+        $gates = Gate::where('status', 'active')->orderBy('code')->get();
+        return view('staff.gates.index', compact('gates'));
     }
 }
