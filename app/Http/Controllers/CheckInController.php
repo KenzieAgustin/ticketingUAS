@@ -37,7 +37,7 @@ class CheckInController extends Controller
             'duplicate' => CheckIn::whereDate('checked_at', $request->date ?? today())->where('status', 'duplicate')->count(),
         ];
 
-        return view('check-ins.index', compact('checkIns', 'gates', 'stats'));
+        return view('admin.check-ins.index', compact('checkIns', 'gates', 'stats'));
     }
 
     // POST /check-ins/scan
@@ -63,5 +63,12 @@ class CheckInController extends Controller
         return redirect()->route('check-ins.index')
             ->with('success', $msg)
             ->with('error', $err);
+    }
+
+    // GET /staff/check-ins/scan
+    public function staffScan()
+    {
+        $gates = Gate::where('status', 'active')->orderBy('name')->get();
+        return view('staff.check-ins.scan', compact('gates'));
     }
 }

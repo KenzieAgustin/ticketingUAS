@@ -25,7 +25,7 @@ class ReviewController extends Controller
             'rejected' => Review::where('status', 'rejected')->count(),
         ];
 
-        return view('reviews.index', compact('reviews', 'stats'));
+        return view('admin.reviews.index', compact('reviews', 'stats'));
     }
 
     // PATCH /reviews/{review}/approve
@@ -36,7 +36,7 @@ class ReviewController extends Controller
             'approved_at' => now(),
         ]);
 
-        return redirect()->route('reviews.index')->with('success', 'Ulasan berhasil disetujui.');
+        return redirect()->route('admin.reviews.index')->with('success', 'Ulasan berhasil disetujui.');
     }
 
     // PATCH /reviews/{review}/reject
@@ -49,6 +49,6 @@ class ReviewController extends Controller
             'rejected_reason' => $request->reason,
         ]);
 
-        return redirect()->route('reviews.index')->with('success', 'Ulasan berhasil ditolak.');
+        return redirect()->route('admin.reviews.index')->with('success', 'Ulasan berhasil ditolak.');
     }
 }

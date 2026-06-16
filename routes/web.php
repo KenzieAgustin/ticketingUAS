@@ -119,9 +119,23 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::patch('/users/{user}/role', [AdminController::class, 'updateRole'])->name('role.update');
+
+    Route::get('/operational', [DashboardController::class, 'index'])->name('operational');
+    Route::get('/sales-report', [SalesReportController::class, 'index'])->name('sales-report.index');
+    Route::resource('gates', GateController::class)->except(['create', 'edit']);
+    Route::resource('staff-assignments', StaffAssignmentController::class)->except(['create', 'edit', 'show']);
+    Route::patch('/staff-assignments/{staffAssignment}/status', [StaffAssignmentController::class, 'updateStatus'])->name('staff-assignments.updateStatus');
+    Route::get('/check-ins', [CheckInController::class, 'index'])->name('check-ins.index');
+    Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan');
+    Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('reviews.index');
+    Route::patch('/reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::patch('/reviews/{review}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
 });
 
 Route::middleware(['auth', 'role:admin,staff_gate'])->prefix('staff')->name('staff.')->group(function () {
+    Route::get('/gates', [GateController::class, 'staffIndex'])->name('gates.index');
+    Route::get('/check-ins/scan', [CheckInController::class, 'staffScan'])->name('check-ins.scan');
+    Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan.post');
    
 });
 
