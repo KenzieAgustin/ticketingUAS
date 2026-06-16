@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'points',
         'phone',
         'address',
         'avatar',
@@ -76,5 +77,10 @@ class User extends Authenticatable
     public function hasRole(string|array $roles):bool
     {
         return in_array($this->role, (array) $roles);
+    }
+
+    public function activities()
+    {
+        return $this->hasMany(UserActivity::class);
     }
 }
