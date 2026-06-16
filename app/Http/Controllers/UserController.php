@@ -17,6 +17,11 @@ class UserController extends Controller
         ]);
     }
 
+    public function showPassword()
+    {
+        return view('profile.password');
+    }
+    
     public function edit()
     {
         return view('profile.edit', [

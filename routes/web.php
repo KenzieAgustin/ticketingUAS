@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [UserController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [UserController::class, 'update'])->name('profile.update');
+    Route::get('/profile/password', [UserController::class, 'showPassword'])->name('profile.password.show');
     Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password');
 
     // Notifications
