@@ -122,7 +122,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 Route::middleware(['auth', 'role:admin,staff_gate'])->prefix('staff')->name('staff.')->group(function () {
-   
+
 });
 
 Route::resource('stages', StageWebController::class)->names('web.stages');

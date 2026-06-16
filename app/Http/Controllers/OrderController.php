@@ -40,7 +40,7 @@ class OrderController extends Controller
 
 
         $order = Order::create([
-            'user_id' => 1,
+            'user_id' => auth()->id(),
             'order_number' => 'ORD-' . time(),
             'nama' => $request->nama ?? 'Guest',
             'quantity' => $request->quantity ?? 1,
