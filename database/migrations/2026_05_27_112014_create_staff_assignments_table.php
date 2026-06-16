@@ -22,6 +22,8 @@ return new class extends Migration
             $table->time('shift_end');
             $table->enum('status', ['scheduled', 'active', 'completed', 'absent'])->default('scheduled');
             $table->text('notes')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('gate_id')->references('id')->on('gates')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });

@@ -115,35 +115,41 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Operational & Report
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/summary', [DashboardController::class, 'summary']);
-    Route::get('/dashboard/sales-report', [DashboardController::class, 'salesReport'])->name('sales-report.index');
+    Route::get('/sales-report', [SalesReportController::class, 'index'])->name('sales-report.index');
+    Route::get('/operational', [DashboardController::class, 'index'])->name('operational');
 
     // Gates
     Route::get('/gates', [GateController::class, 'index'])->name('gates.index');
     Route::post('/gates', [GateController::class, 'store']);
     Route::put('/gates/{gate}', [GateController::class, 'update']);
     Route::delete('/gates/{gate}', [GateController::class, 'destroy']);
+    Route::resource('gates', GateController::class)->except(['create', 'edit']);
 
     // Staff assignment
     Route::get('/staff-assignments', [StaffAssignmentController::class, 'index'])->name('staff-assignments.index');
     Route::post('/staff-assignments', [StaffAssignmentController::class, 'store']);
     Route::delete('/staff-assignments/{staffAssignment}', [StaffAssignmentController::class, 'destroy']);
-    Route::patch('/staff-assignments/{staffAssignment}/status', [StaffAssignmentController::class, 'updateStatus']);
+    Route::patch('/staff-assignments/{staffAssignment}/status', [StaffAssignmentController::class, 'updateStatus'])->name('staff-assignments.updateStatus');
+    Route::resource('staff-assignments', StaffAssignmentController::class)->except(['create', 'edit', 'show']);
 
     // Check-ins
     Route::get('/check-ins', [CheckInController::class, 'index'])->name('check-ins.index');
+    Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan');
 
     // Reviews
-    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
-    Route::patch('/reviews/{review}/approve', [ReviewController::class, 'approve']);
-    Route::patch('/reviews/{review}/reject', [ReviewController::class, 'reject']);
-
+    Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('reviews.index');
+    Route::patch('/reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::patch('/reviews/{review}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
+  
 });
 
 // Staff gate
 Route::middleware(['auth', 'role:admin,staff_gate'])->prefix('staff')->name('staff.')->group(function () {
     // Ticket & Token module
     Route::get('/scan', [TicketTokenController::class, 'scanWeb']);
-
-    // Operational & Report
-    Route::post('/check-ins/scan', [CheckInController::class, 'scan']);
+  
+    Route::get('/gates', [GateController::class, 'staffIndex'])->name('gates.index');
+    Route::get('/check-ins/scan', [CheckInController::class, 'staffScan'])->name('check-ins.scan');
+    Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan.post');
+   
 });

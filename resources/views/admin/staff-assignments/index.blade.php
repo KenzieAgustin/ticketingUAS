@@ -1,24 +1,44 @@
-<html>
-<head><title>Jadwal Staff</title></head>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Jadwal Staff</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; }
+        h1 { font-size: 20px; margin-bottom: 2px; }
+        .subtitle { font-size: 13px; color: #888; margin-bottom: 16px; }
+        nav a { color: #333; text-decoration: none; margin-right: 4px; }
+        nav a:hover { text-decoration: underline; }
+        .alert-success { padding: 8px 12px; background: #e6f4ea; border-left: 3px solid #4caf50; margin-bottom: 16px; font-size: 14px; }
+        .alert-error { padding: 8px 12px; background: #fee; border-left: 3px solid red; margin-bottom: 16px; font-size: 14px; }
+        hr { border: none; border-top: 1px solid #ddd; margin: 16px 0; }
+    </style>
+</head>
 <body>
+
+<h1>Pekan Raya Jakarta</h1>
+<p class="subtitle">{{ Auth::user()->name }} — {{ Auth::user()->role }}</p>
+
+<nav>
+    <a href="{{ route('home') }}">Home</a> |
+    <a href="{{ route('dashboard') }}">Dashboard</a> |
+    <a href="{{ route('gates.index') }}">Gate</a> |
+    <a href="{{ route('staff-assignments.index') }}">Jadwal Staff</a> |
+    <a href="{{ route('check-ins.index') }}">Check-in</a> |
+    <a href="{{ route('reviews.index') }}">Review</a> |
+    <a href="{{ route('sales-report.index') }}">Sales Report</a> |
+    <form method="POST" action="{{ route('logout') }}" style="display:inline">
+        @csrf
+        <button type="submit" style="background:none;border:none;cursor:pointer;color:#c00;padding:0;font-size:14px">Logout</button>
+    </form>
+</nav>
+
+<hr>
 
 <h2>Jadwal Staff</h2>
 
-<a href="{{ route('dashboard') }}">Dashboard</a> |
-<a href="{{ route('gates.index') }}">Gate</a> |
-<a href="{{ route('staff-assignments.index') }}">Jadwal Staff</a> |
-<a href="{{ route('check-ins.index') }}">Check-in</a> |
-<a href="{{ route('reviews.index') }}">Review</a> |
-<a href="{{ route('sales-report.index') }}">Sales Report</a> |
-<form method="POST" action="{{ route('logout') }}" style="display:inline">
-    @csrf <button type="submit">Logout</button>
-</form>
-
-<br><br>
-
-{{-- Tampilkan error validasi --}}
 @if($errors->any())
-    <div style="background:#fee;border:1px solid red;padding:10px;margin-bottom:10px">
+    <div class="alert-error">
         <strong>Gagal menyimpan:</strong>
         <ul>
         @foreach($errors->all() as $e)
@@ -29,7 +49,7 @@
 @endif
 
 @if(session('success'))
-    <p><strong>{{ session('success') }}</strong></p>
+    <div class="alert-success">{{ session('success') }}</div>
 @endif
 
 <a href="#" onclick="document.getElementById('form-tambah').style.display='block'">+ Tambah Jadwal</a>
@@ -39,7 +59,13 @@
     <h3>Tambah Jadwal Staff</h3>
     <form method="POST" action="{{ route('staff-assignments.store') }}">
         @csrf
-        Staff ID: <input type="number" name="user_id" required><br><br>
+        Nama Staff:
+        <select name="user_id" required>
+            <option value="">-- Pilih Staff --</option>
+            @foreach($staffs as $staff)
+            <option value="{{ $staff->id }}">{{ $staff->name }} ({{ $staff->email }})</option>
+            @endforeach
+        </select><br><br>
         Gate:
         <select name="gate_id" required>
             <option value="">-- Pilih Gate --</option>
@@ -47,7 +73,13 @@
             <option value="{{ $gate->id }}">{{ $gate->name }} ({{ $gate->code }})</option>
             @endforeach
         </select><br><br>
-        Event ID: <input type="number" name="event_id" required><br><br>
+        Event:
+        <select name="event_id" required>
+            <option value="">-- Pilih Event --</option>
+            @foreach($events as $event)
+            <option value="{{ $event->id }}">{{ $event->name }}</option>
+            @endforeach
+        </select><br><br>
         Tanggal: <input type="date" name="assignment_date" required><br><br>
         Shift:
         <select name="shift" required>
@@ -69,7 +101,6 @@
     </form>
 </div>
 
-{{-- Filter --}}
 <form method="GET">
     Tanggal: <input type="date" name="assignment_date" value="{{ request('assignment_date') }}">
     Shift:
@@ -96,16 +127,7 @@
 @else
 <table border="1" cellpadding="5" cellspacing="0">
     <thead>
-        <tr>
-            <th>No</th>
-            <th>Nama Staff</th>
-            <th>Gate</th>
-            <th>Tanggal</th>
-            <th>Shift</th>
-            <th>Jam</th>
-            <th>Status</th>
-            <th>Aksi</th>
-        </tr>
+        <tr><th>No</th><th>Nama Staff</th><th>Gate</th><th>Tanggal</th><th>Shift</th><th>Jam</th><th>Status</th><th>Aksi</th></tr>
     </thead>
     <tbody>
         @foreach($assignments as $a)
