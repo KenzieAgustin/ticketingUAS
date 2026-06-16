@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('ticket_zones', function (Blueprint $table) {
-            $table->unsignedBigInteger('price')->default(0)->after('zone_name');
+            $table->decimal('price', 12, 2)->default(0)->after('zone_name');
         });
     }
 
