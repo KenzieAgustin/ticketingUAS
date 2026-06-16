@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            //pake unsignedBigInteger dulu biar ga error karena belum dibuat tabel events
-            $table->unsignedBigInteger('event_id');
+            $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
             $table->enum('ticket_type',['entry_only', 'entry_concert']);//enum untuk jenis tiket, karena ada 2 yaitu entry only dan entry concert
             $table->decimal('price', 12, 2);//decimal untuk harga tiket, dengan total 12 digit dan 2 digit dibelakang koma  
             $table->timestamps();

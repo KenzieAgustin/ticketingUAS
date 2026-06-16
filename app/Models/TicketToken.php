@@ -14,8 +14,8 @@ class TicketToken extends Model
     ];
 
     //nanti bisa ditambah relasi ke order item
-    // public function orderItem()
-    // {
-    //     return $this->belongsTo(OrderItem::class);
-    // }
+     public function orderItem()
+    {
+         return $this->belongsTo(OrderItem::class);
+    }
 }

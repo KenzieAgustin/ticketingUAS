@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ticket_zones', function (Blueprint $table) {
-            $table->unsignedBigInteger('price')->default(0)->after('zone_name');
+        Schema::create('user_activities', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('action');
+            $table->string('ip_address')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -21,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ticket_zones', function (Blueprint $table) {
-            $table->dropColumn('price');
-        });
+        Schema::dropIfExists('user_activities');
     }
 };

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\TicketZone;
 
 class OrderItem extends Model
 {
@@ -13,8 +14,8 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
-    public function ticketType()
+    public function ticketZone()
     {
-        return $this->belongsTo(TicketType::class);
+        return $this->belongsTo(TicketZone::class);
     }
 }

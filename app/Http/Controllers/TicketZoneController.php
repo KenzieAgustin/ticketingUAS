@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\models\TicketZone;
+use App\Models\TicketZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -21,14 +21,14 @@ class TicketZoneController extends Controller
     public function reduceQuota(Request $request)
     {
         $request->validate([
-            'ticket_zone_id' => 'required|exist:ticket_zones,id'
+            'ticket_zone_id' => 'required|exists:ticket_zones,id'
         ]);
 
         try {
             $zone = null;
 
             DB::transaction(function () use ($request, &$zone) {
-                $zone = TicketZone::LookForUpdate()->find($request->ticket_zone_id);
+                $zone = TicketZone::lockForUpdate()->find($request->ticket_zone_id);
 
                 if (!$zone->isAvailable()) {
                     throw new \Exception('Kuota sudah habis');

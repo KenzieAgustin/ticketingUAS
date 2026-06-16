@@ -55,11 +55,11 @@ class TicketController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'ticket_type' => 'required|string|unique:tickets,ticket_type',
-            'base_price' => 'required|numeric|min:0',
+            'ticket_type' => 'required|string|in:entry_only,entry_concert|unique:tickets,ticket_type',
+            'price' => 'required|numeric|min:0',
         ]);
 
-        $ticket = Ticket::create($request->all());
+        $ticket = Ticket::create($request->only(['ticket_type', 'price', 'event_id']));
         return response()->json([
             'success' => true,
             'message' => 'Tiket berhasil dibuat',
