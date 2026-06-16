@@ -99,8 +99,8 @@ class TicketTokenController extends Controller
             'data'    => [
                 'booking_code' => $token->booking_code,
                 //info lengkap tampilan dihalaman scan
-                'ticket_type' => optional(optional(optional($token->orderItem)->ticketZone)->ticket)->ticket_type,
-                'zone_name'   => optional(optional($token->orderItem)->ticketZone)->zone
+                'ticket_type' => $token->orderItem?->ticketZone?->ticket?->ticket_type,
+                'zone_name'   => $token->orderItem?->ticketZone?->zone_name,
             ],
         ], 200);
     }
