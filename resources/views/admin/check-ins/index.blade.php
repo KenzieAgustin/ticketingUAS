@@ -21,12 +21,12 @@
 
 <nav>
     <a href="{{ route('home') }}">Home</a> |
-    <a href="{{ route('dashboard') }}">Dashboard</a> |
-    <a href="{{ route('gates.index') }}">Gate</a> |
-    <a href="{{ route('staff-assignments.index') }}">Jadwal Staff</a> |
-    <a href="{{ route('check-ins.index') }}">Check-in</a> |
-    <a href="{{ route('reviews.index') }}">Review</a> |
-    <a href="{{ route('sales-report.index') }}">Sales Report</a> |
+    <a href="{{ route('admin.dashboard') }}">Dashboard</a> |
+    <a href="{{ route('admin.gates.index') }}">Gate</a> |
+    <a href="{{ route('admin.staff-assignments.index') }}">Jadwal Staff</a> |
+    <a href="{{ route('admin.check-ins.index') }}">Check-in</a> |
+    <a href="{{ route('admin.reviews.index') }}">Review</a> |
+    <a href="{{ route('admin.sales-report.index') }}">Sales Report</a> |
     <form method="POST" action="{{ route('logout') }}" style="display:inline">
         @csrf
         <button type="submit" style="background:none;border:none;cursor:pointer;color:#c00;padding:0;font-size:14px">Logout</button>
@@ -45,7 +45,7 @@
 @endif
 
 <h3>Scan / Input Kode Tiket</h3>
-<form method="POST" action="{{ route('check-ins.scan') }}">
+<form method="POST" action="{{ route('admin.check-ins.scan') }}">
     @csrf
     Kode Booking: <input type="text" name="booking_code" required placeholder="Ketik atau scan...">
     Gate:
@@ -87,7 +87,7 @@
         @endforeach
     </select>
     <button type="submit">Filter</button>
-    <a href="{{ route('check-ins.index') }}">Reset</a>
+    <a href="{{ route('admin.check-ins.index') }}">Reset</a>
 </form>
 <br>
 
