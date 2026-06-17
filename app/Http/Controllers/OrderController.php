@@ -77,7 +77,7 @@ class OrderController extends Controller
                 // Buat order
                 $order = Order::create([
                     'user_id'      => Auth::id(),
-                    'order_number' => 'ORD-' . time(),
+                    'order_number' => 'PRJ-' . time(),
                     'total_amount' => $total_amount,
                     'voucher_id'   => $voucherId,
                     'status'       => 'pending',
@@ -143,7 +143,9 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        $order = Order::where('user_id', Auth::id())->findOrFail($id);
+        $order = Order::where('user_id', Auth::id())
+                        ->with(['items.ticketZone.ticket', 'items.token'])
+                        ->findOrFail($id);
         return view('orders.show', compact('order'));
     }
 
