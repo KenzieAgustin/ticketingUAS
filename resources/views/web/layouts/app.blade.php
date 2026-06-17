@@ -7,37 +7,35 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
-        body { background-color: #f8f9fa; margin: 0; }
+        body { background-color: #faf7f0; margin: 0; }
 
-        /* SIDEBAR */
         .sidebar {
             min-height: 100vh;
-            background: linear-gradient(180deg, #1a1a2e, #16213e, #0f3460);
+            background: #fffdf8;
+            border-right: 1px solid #ece4d3;
             padding-top: 0;
             position: sticky;
             top: 0;
         }
 
-        /* BRAND - gold, calm tone */
         .sidebar .brand {
-            color: #f5c842;
+            color: #b8860b;
             font-size: 1.1rem;
             font-weight: 800;
             padding: 20px 16px 16px;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
+            border-bottom: 2px solid #ece4d3;
             margin-bottom: 8px;
             letter-spacing: 0.5px;
         }
 
         .sidebar .nav-label {
-            color: rgba(255,255,255,0.4);
+            color: #a39a87;
             font-size: 0.7rem;
             text-transform: uppercase;
             padding: 12px 16px 4px;
             letter-spacing: 2px;
         }
 
-        /* Tiap menu beda warna */
         .sidebar a {
             text-decoration: none;
             display: flex;
@@ -49,29 +47,27 @@
             font-size: 0.88rem;
             font-weight: 500;
             transition: all 0.2s;
-            color: rgba(255,255,255,0.7);
+            color: #6b5d4f;
             border-left: 3px solid transparent;
         }
 
-        .sidebar a:hover { color: white; transform: translateX(4px); }
+        .sidebar a:hover { color: #3d342a; transform: translateX(4px); background: #f5efe2; }
 
-        /* Warna per menu */
-        .sidebar a.menu-1:hover, .sidebar a.menu-1.active { background: rgba(255, 107, 107, 0.2); border-left-color: #ff6b6b; color: #ff6b6b; }
-        .sidebar a.menu-2:hover, .sidebar a.menu-2.active { background: rgba(255, 217, 61, 0.2); border-left-color: #ffd93d; color: #ffd93d; }
-        .sidebar a.menu-3:hover, .sidebar a.menu-3.active { background: rgba(107, 203, 119, 0.2); border-left-color: #6bcb77; color: #6bcb77; }
-        .sidebar a.menu-4:hover, .sidebar a.menu-4.active { background: rgba(77, 150, 255, 0.2); border-left-color: #4d96ff; color: #4d96ff; }
-        .sidebar a.menu-5:hover, .sidebar a.menu-5.active { background: rgba(255, 154, 86, 0.2); border-left-color: #ff9a56; color: #ff9a56; }
-        .sidebar a.menu-6:hover, .sidebar a.menu-6.active { background: rgba(199, 125, 255, 0.2); border-left-color: #c77dff; color: #c77dff; }
+        .sidebar a.menu-1:hover, .sidebar a.menu-1.active { background: rgba(255, 107, 107, 0.12); border-left-color: #e85d5d; color: #c84545; }
+        .sidebar a.menu-2:hover, .sidebar a.menu-2.active { background: rgba(218, 165, 32, 0.15); border-left-color: #daa520; color: #b8860b; }
+        .sidebar a.menu-3:hover, .sidebar a.menu-3.active { background: rgba(107, 203, 119, 0.15); border-left-color: #5cb868; color: #4a9856; }
+        .sidebar a.menu-4:hover, .sidebar a.menu-4.active { background: rgba(77, 150, 255, 0.12); border-left-color: #4d96ff; color: #3a7ad8; }
+        .sidebar a.menu-5:hover, .sidebar a.menu-5.active { background: rgba(255, 154, 86, 0.15); border-left-color: #ff9a56; color: #d97e3f; }
+        .sidebar a.menu-6:hover, .sidebar a.menu-6.active { background: rgba(199, 125, 255, 0.12); border-left-color: #c77dff; color: #a85fe0; }
 
-        /* HEADER - deep blue to purple, calm tone (tema Jakarta Fair) */
         .top-header {
-            background: linear-gradient(90deg, #1a2a6c, #2d1b69, #4a1f8c);
-            padding: 12px 24px;
-            color: #f5c842;
+            background: #fffdf8;
+            border-bottom: 2px solid #ece4d3;
+            padding: 14px 24px;
+            color: #5a4a35;
             font-weight: 700;
             font-size: 1rem;
-            letter-spacing: 1px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            letter-spacing: 0.5px;
         }
 
         .main-content { padding: 24px; }
@@ -83,9 +79,9 @@
             margin-bottom: 24px;
         }
 
-        /* Step guide */
         .step-guide {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            background: #fffdf8;
+            border: 1px solid #ece4d3;
             border-radius: 12px;
             padding: 14px 20px;
             margin-bottom: 20px;
@@ -94,31 +90,29 @@
             gap: 8px;
             flex-wrap: wrap;
         }
-        .step-guide span { font-size: 0.78rem; color: rgba(255,255,255,0.5); }
+        .step-guide span { font-size: 0.78rem; color: #a39a87; }
         .step-guide .step {
-            background: rgba(255,255,255,0.1);
-            color: white;
+            background: #f5efe2;
+            color: #6b5d4f;
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.78rem;
             font-weight: 600;
         }
-        .step-guide .step.done { background: #6bcb77; color: #1a1a2e; }
-        .step-guide .step.current { background: #4d96ff; color: white; }
-        .step-guide .arrow { color: rgba(255,255,255,0.3); font-size: 0.7rem; }
+        .step-guide .step.done { background: #cfe8d2; color: #2f5d36; }
+        .step-guide .step.current { background: #b8860b; color: white; }
+        .step-guide .arrow { color: #c9bfac; font-size: 0.7rem; }
     </style>
 </head>
 <body>
 <div class="container-fluid">
     <div class="row">
-        {{-- Sidebar --}}
         <div class="col-md-2 px-0 sidebar">
             <div class="brand">
                 <i class="bi bi-ticket-perforated-fill"></i> PRJ Ticketing
             </div>
             <div class="nav-label">Event & Konser</div>
 
-            {{-- Urutan sesuai alur pengisian --}}
             <a href="{{ route('web.event-categories.index') }}"
                class="menu-1 {{ request()->routeIs('web.event-categories.*') ? 'active' : '' }}">
                 <i class="bi bi-tags-fill"></i>
@@ -151,17 +145,14 @@
             </a>
         </div>
 
-        {{-- Main Content --}}
         <div class="col-md-10 px-0">
 
-            {{-- Header bar (calm tone) --}}
             <div class="top-header">
                 PRJ — Pekan Raya Jakarta · Event & Konser Management
             </div>
 
             <div class="main-content">
 
-                {{-- Step guide --}}
                 <div class="step-guide">
                     <span>Urutan isi data:</span>
                     <span class="step {{ request()->routeIs('web.event-categories.*') ? 'current' : '' }}">1 Kategori</span>
