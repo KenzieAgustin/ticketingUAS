@@ -18,12 +18,9 @@
             top: 0;
         }
 
-        /* BRAND - gradasi rainbow */
+        /* BRAND - gold, calm tone */
         .sidebar .brand {
-            background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #f5c842;
             font-size: 1.1rem;
             font-weight: 800;
             padding: 20px 16px 16px;
@@ -66,11 +63,11 @@
         .sidebar a.menu-5:hover, .sidebar a.menu-5.active { background: rgba(255, 154, 86, 0.2); border-left-color: #ff9a56; color: #ff9a56; }
         .sidebar a.menu-6:hover, .sidebar a.menu-6.active { background: rgba(199, 125, 255, 0.2); border-left-color: #c77dff; color: #c77dff; }
 
-        /* HEADER gradasi rainbow */
+        /* HEADER - deep blue to purple, calm tone (tema Jakarta Fair) */
         .top-header {
-            background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
+            background: linear-gradient(90deg, #1a2a6c, #2d1b69, #4a1f8c);
             padding: 12px 24px;
-            color: white;
+            color: #f5c842;
             font-weight: 700;
             font-size: 1rem;
             letter-spacing: 1px;
@@ -157,9 +154,9 @@
         {{-- Main Content --}}
         <div class="col-md-10 px-0">
 
-            {{-- Rainbow header bar --}}
+            {{-- Header bar (calm tone) --}}
             <div class="top-header">
-                🎪 PRJ — Pekan Raya Jakarta · Event & Konser Management
+                PRJ — Pekan Raya Jakarta · Event & Konser Management
             </div>
 
             <div class="main-content">
