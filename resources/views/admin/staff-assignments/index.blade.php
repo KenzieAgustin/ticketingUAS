@@ -21,12 +21,12 @@
 
 <nav>
     <a href="{{ route('home') }}">Home</a> |
-    <a href="{{ route('dashboard') }}">Dashboard</a> |
-    <a href="{{ route('gates.index') }}">Gate</a> |
-    <a href="{{ route('staff-assignments.index') }}">Jadwal Staff</a> |
-    <a href="{{ route('check-ins.index') }}">Check-in</a> |
-    <a href="{{ route('reviews.index') }}">Review</a> |
-    <a href="{{ route('sales-report.index') }}">Sales Report</a> |
+    <a href="{{ route('admin.dashboard') }}">Dashboard</a> |
+    <a href="{{ route('admin.gates.index') }}">Gate</a> |
+    <a href="{{ route('admin.staff-assignments.index') }}">Jadwal Staff</a> |
+    <a href="{{ route('admin.check-ins.index') }}">Check-in</a> |
+    <a href="{{ route('admin.reviews.index') }}">Review</a> |
+    <a href="{{ route('admin.sales-report.index') }}">Sales Report</a> |
     <form method="POST" action="{{ route('logout') }}" style="display:inline">
         @csrf
         <button type="submit" style="background:none;border:none;cursor:pointer;color:#c00;padding:0;font-size:14px">Logout</button>
@@ -57,7 +57,7 @@
 
 <div id="form-tambah" style="display:none">
     <h3>Tambah Jadwal Staff</h3>
-    <form method="POST" action="{{ route('staff-assignments.store') }}">
+    <form method="POST" action="{{ route('admin.staff-assignments.store') }}">
         @csrf
         Nama Staff:
         <select name="user_id" required>
@@ -118,7 +118,7 @@
         @endforeach
     </select>
     <button type="submit">Filter</button>
-    <a href="{{ route('staff-assignments.index') }}">Reset</a>
+    <a href="{{ route('admin.staff-assignments.index') }}">Reset</a>
 </form>
 <br>
 
@@ -141,7 +141,7 @@
             <td>{{ ucfirst($a->status) }}</td>
             <td>
                 <a href="#" onclick="document.getElementById('status-{{ $a->id }}').style.display='block'">Update Status</a> |
-                <form action="{{ route('staff-assignments.destroy', $a) }}" method="POST" style="display:inline" onsubmit="return confirm('Hapus jadwal ini?')">
+                <form action="{{ route('admin.staff-assignments.destroy', $a) }}" method="POST" style="display:inline" onsubmit="return confirm('Hapus jadwal ini?')">
                     @csrf @method('DELETE')
                     <button type="submit">Hapus</button>
                 </form>
@@ -149,7 +149,7 @@
         </tr>
         <tr id="status-{{ $a->id }}" style="display:none;background:#f5f5f5">
             <td colspan="8">
-                <form method="POST" action="{{ route('staff-assignments.updateStatus', $a) }}">
+                <form method="POST" action="{{ route('admin.staff-assignments.updateStatus', $a) }}">
                     @csrf @method('PATCH')
                     Status:
                     <select name="status">

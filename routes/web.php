@@ -147,7 +147,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:admin,staff_gate'])->prefix('staff')->name('staff.')->group(function () {
     // Ticket & Token module
     Route::get('/scan', [TicketTokenController::class, 'scanWeb']);
-
+  
+    Route::get('/scan', [TicketTokenController::class, 'scanWeb'])->name('scan');
     Route::get('/gates', [GateController::class, 'staffIndex'])->name('gates.index');
     Route::get('/check-ins/scan', [CheckInController::class, 'staffScan'])->name('check-ins.scan');
     Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan.post');
