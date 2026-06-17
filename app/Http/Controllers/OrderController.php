@@ -125,6 +125,7 @@ class OrderController extends Controller
         }
     }
 
+
     public function index(Request $request)
     {
         $sort  = $request->query('sort', 'terbaru');
@@ -149,16 +150,19 @@ class OrderController extends Controller
 
     public function checkVoucher(Request $request)
     {
-        $voucher = Voucher::where('code', $request->voucher_code)
-            ->where('valid_until', '>=', now())
-            ->where('max_usage', '>', 0)
-            ->first();
+        $voucherId = null;
+        if ($request->filled('voucher_code')) {
+            $voucher = Voucher::where('code', $request->voucher_code)
+                ->where('expired_at', '>=', now())
+                ->whereColumn('quota', '>', 'used')
+                ->first();
 
-        if ($voucher) {
-            return response()->json([
+            if ($voucher) {
+                return response()->json([
                 'status'          => 'success',
                 'discount_amount' => $voucher->discount_amount,
                 'message'         => 'Voucher berhasil digunakan!',
+                $voucher->increment('used'),
             ]);
         }
 
@@ -166,6 +170,7 @@ class OrderController extends Controller
             'status'          => 'error',
             'discount_amount' => 0,
             'message'         => 'Voucher tidak valid, kadaluarsa, atau kuota habis.',
-        ]);
+            ]);
+        }
     }
 }

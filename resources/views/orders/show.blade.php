@@ -12,7 +12,7 @@
 
         <div class="bg-gradient-to-br from-gray-900 to-gray-700 p-6 text-white text-center">
             <h2 class="text-xs font-semibold tracking-widest uppercase opacity-80 mb-1">E-Ticket Masuk</h2>
-            <h1 class="text-2xl font-bold">Acara Apa ?</h1>
+            <h1 class="text-2xl font-bold">PRJ 2026</h1>
         </div>
 
         <div class="relative flex justify-between items-center px-4 -mt-3">
