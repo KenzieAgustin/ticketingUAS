@@ -106,10 +106,11 @@ class PaymentController extends Controller
                 mkdir(public_path('qrcodes'), 0777, true);
             }
 
-            $fileName = $bookingCode . '.png';
+            $fileName = $bookingCode . '.svg';
             $path     = public_path('qrcodes/' . $fileName);
 
-            QrCode::format('png')->size(250)->generate($bookingCode, $path);
+            $svgContent = QrCode::format('svg')->size(250)->generate($bookingCode);
+            file_put_contents($path, $svgContent);
 
             TicketToken::create([
                 'order_item_id' => $item->id,

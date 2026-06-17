@@ -47,8 +47,15 @@
             </div>
 
             <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col items-center">
-                <div class="w-full h-16 bg-[repeating-linear-gradient(90deg,black,black_2px,transparent_2px,transparent_6px,black_6px,black_10px)] opacity-80 mb-3 rounded-sm"></div>
-                <p class="text-xs font-mono tracking-widest text-gray-500">{{ $order->order_number }}</p>
+                @php $token = $order->items->first()?->token ?? null; @endphp
+                @if($token && $token->qr_code_path && file_exists(public_path($token->qr_code_path)))
+                    <img src="{{ asset($token->qr_code_path) }}" alt="QR Code" class="w-40 h-40 mb-3">
+                    <p class="text-xs font-mono tracking-widest text-gray-500">{{ $token->booking_code }}</p>
+                @elseif($order->status === 'paid')
+                    <p class="text-xs text-yellow-600 text-center">QR Code sedang digenerate, refresh sebentar lagi.</p>
+                @else
+                    <p class="text-xs text-gray-400 text-center">QR Code akan muncul setelah pembayaran selesai.</p>
+                @endif
             </div>
         </div>
 

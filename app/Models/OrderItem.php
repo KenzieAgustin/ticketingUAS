@@ -18,4 +18,9 @@ class OrderItem extends Model
     {
         return $this->belongsTo(TicketZone::class);
     }
+
+    public function token()
+    {
+        return $this->hasOne(TicketToken::class, 'order_item_id');
+    }
 }
