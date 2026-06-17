@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use App\Models\UserActivity;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -39,6 +41,13 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+
+            UserActivity::create([
+                'user_id'    => Auth::id(),
+                'action'     => 'login',
+                'ip_address' => $request->ip(),
+            ]);            
+
             return redirect()->intended('/home');
         }
 
@@ -47,11 +56,17 @@ class AuthController extends Controller
         ])->onlyInput('email');
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
+        UserActivity::create([
+            'user_id'    => Auth::id(),
+            'action'     => 'logout',
+            'ip_address' => $request->ip(),
+        ]);
+        
         Auth::logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return redirect()->route('login');
     }

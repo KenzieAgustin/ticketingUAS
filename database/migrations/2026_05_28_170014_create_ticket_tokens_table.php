@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('ticket_tokens', function (Blueprint $table) {
             $table->id();
-            //pake unsignedBigInteger dulu biar ga error karena belum dibuat tabel order_items
-            $table->unsignedBigInteger('order_item_id');
+            $table->foreignId('order_item_id')->constrained('order_items')->onDelete('cascade');
             $table->string('booking_code')->unique(); //kode unik untuk setiap tiket yang dibeli
             $table->string('qr_code_path'); //path untuk menyimpan file QR code yang di-generate
             $table->enum('status', ['valid', 'used'])->default('valid');//status tiket, valid berarti bisa digunakan untuk masuk, used berarti sudah digunakan untuk masuk

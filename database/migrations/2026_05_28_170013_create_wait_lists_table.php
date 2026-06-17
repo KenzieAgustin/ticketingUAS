@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('wait_lists', function (Blueprint $table) {
             $table->id();
-            //pake unsignedBigInteger dulu biar ga error karena belum dibuat tabel user
-            $table->unsignedBigInteger('user_id');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             //relasi ke table ticket_zones
             $table->foreignId('ticket_zone_id')->constrained('ticket_zones')->onDelete('cascade');
             //waiting=user ada dalam antrian

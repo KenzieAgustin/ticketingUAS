@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ticket_zones', function (Blueprint $table) {
-            $table->unsignedBigInteger('price')->default(0)->after('zone_name');
+        Schema::table('refunds', function (Blueprint $table) {
+            $table->foreignId('user_id')->after('order_id')->constrained()->onDelete('cascade');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ticket_zones', function (Blueprint $table) {
-            $table->dropColumn('price');
+        Schema::table('refunds', function (Blueprint $table) {
+            //
         });
     }
 };

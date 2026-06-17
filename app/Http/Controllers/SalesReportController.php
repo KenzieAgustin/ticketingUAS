@@ -48,13 +48,17 @@ class SalesReportController extends Controller
             ->get();
 
         // Top events
-        $topEvents = (clone $baseQuery)
+        /*$topEvents = (clone $baseQuery)
             ->selectRaw('tt.event_id, SUM(oi.quantity) as tickets_sold, SUM(oi.subtotal) as revenue')
             ->groupBy('tt.event_id')
             ->orderBy('revenue', 'desc')
             ->limit(5)
             ->get();
+        */
+        $topEvents = collect();
 
-        return view('dashboard.sales-report', compact('summary', 'dailyReport', 'byTicketType', 'topEvents'));
+        $ticketTypes = \App\Models\Ticket::orderBy('id')->get();
+
+        return view('admin.dashboard.sales-report', compact('summary', 'dailyReport', 'byTicketType', 'topEvents', 'ticketTypes'));
     }
 }

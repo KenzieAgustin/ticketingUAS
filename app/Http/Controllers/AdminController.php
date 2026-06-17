@@ -3,16 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
-    public function dashboard()
+    public function index()
     {
         $users = User::orderBy('name')->paginate(15);
 
-        return view('admin.dashboard', compact('users'));
+        return view('admin.users', compact('users'));
     }
 
     public function updateRole(Request $request, User $user)
@@ -28,5 +29,14 @@ class AdminController extends Controller
         $user->update(['role' => $request->role]);
 
         return back()->with('success', "Role {$user->name} berhasil diubah ke {$request->role}.");
+    }
+
+    public function activities()
+    {
+        $activities = UserActivity::with('user')
+                        ->latest()
+                        ->paginate(20);
+
+        return view('admin.activities', compact('activities'));
     }
 }
