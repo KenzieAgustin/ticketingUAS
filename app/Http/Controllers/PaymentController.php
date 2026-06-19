@@ -91,35 +91,43 @@ class PaymentController extends Controller
         $items = OrderItem::where('order_id', $order->id)->get();
 
         foreach ($items as $item) {
-            // Skip kalau token sudah ada
-            if (TicketToken::where('order_item_id', $item->id)->exists()) {
+
+        // Hitung berapa token yang sudah ada untuk item ini
+            $existingCount = TicketToken::where('order_item_id', $item->id)->count();
+            $needed        = $item->quantity - $existingCount;
+
+            if ($needed <= 0) {
                 continue;
             }
 
-            // Generate booking code unik
-            do {
-                $bookingCode = 'PRJ2026-' . strtoupper(Str::random(6));
-            } while (TicketToken::where('booking_code', $bookingCode)->exists());
-
-            // Buat folder qrcodes kalau belum ada
+        // Buat folder qrcodes kalau belum ada
             if (!file_exists(public_path('qrcodes'))) {
                 mkdir(public_path('qrcodes'), 0777, true);
             }
 
-            $fileName = $bookingCode . '.svg';
-            $path     = public_path('qrcodes/' . $fileName);
+            for ($i = 0; $i < $needed; $i++) {
 
-            $svgContent = QrCode::format('svg')->size(250)->generate($bookingCode);
-            file_put_contents($path, $svgContent);
+                // Generate booking code unik
+                do {
+                    $bookingCode = 'PRJ2026-' . strtoupper(Str::random(6));
+                } while (TicketToken::where('booking_code', $bookingCode)->exists());
 
-            TicketToken::create([
-                'order_item_id' => $item->id,
-                'booking_code'  => $bookingCode,
-                'qr_code_path'  => 'qrcodes/' . $fileName,
-                'status'        => 'valid',
-            ]);
+                $fileName = $bookingCode . '.svg';
+                $path     = public_path('qrcodes/' . $fileName);
 
-            \Log::info('Token generated: ' . $bookingCode . ' untuk order item ' . $item->id);
+                $svgContent = QrCode::format('svg')->size(250)->generate($bookingCode);
+                file_put_contents($path, $svgContent);
+
+                TicketToken::create([
+                    'order_item_id' => $item->id,
+                    'booking_code'  => $bookingCode,
+                    'qr_code_path'  => 'qrcodes/' . $fileName,
+                    'status'        => 'valid',
+                ]);
+
+                \Log::info('Token generated: ' . $bookingCode . ' untuk order item ' . $item->id);
+            }
         }
     }
 }
+

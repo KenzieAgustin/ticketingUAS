@@ -145,20 +145,45 @@
 
     <script>
         let currentFinalPrice = {{ $ticket->price }};
+        let currentVoucherDiscount = 0;
+        let currentTicketDiscount = 0;
+        let currentPromoName = 'Diskon Weekday';
 
         function updateTotal() {
-            const qty = parseInt(document.getElementById('qty-display').value) || 1;
-            const basePrice = parseInt(document.getElementById('base-price-display').textContent.replace(/[^0-9]/g, '')) || {{ $ticket->price }};
-            const subtotal = qty * basePrice;
-            const total = Math.max(1, subtotal - currentDiscount);
+            const qtyInput = document.getElementById('qty-display');
+            let qty = parseInt(qtyInput.value);
+            if (isNaN(qty) || qty < 1) {
+                qty = 1;
+            }
+
+            const basePriceText = document.getElementById('base-price-display').textContent;
+            const basePrice = parseInt(basePriceText.replace(/[^0-9]/g, '')) || {{ $ticket->price }};
+
+            const priceAfterTicketDiscount = basePrice - currentTicketDiscount;
+            const subtotal = qty * priceAfterTicketDiscount;
+            const total = Math.max(1, subtotal - currentVoucherDiscount);
+
             document.getElementById('final-price').textContent = 'Rp ' + total.toLocaleString('id-ID');
             document.getElementById('form-quantity').value = qty;
             currentFinalPrice = total;
+
+            const totalDiskonTampil = (currentTicketDiscount * qty) + currentVoucherDiscount;
+            if (totalDiskonTampil > 0) {
+                document.getElementById('discount-row').style.display = 'flex';
+                document.getElementById('discount-amount').textContent = '- Rp ' + totalDiskonTampil.toLocaleString('id-ID');
+
+                if (currentVoucherDiscount > 0) {
+                    document.getElementById('promo-label').textContent = 'Voucher & Promo';
+                } else {
+                    document.getElementById('promo-label').textContent = currentPromoName;
+                }
+            } else {
+                document.getElementById('discount-row').style.display = 'none';
+            }
         }
 
         document.getElementById('qty-display').addEventListener('input', updateTotal);
-
-        let currentDiscount = 0;
+        document.getElementById('qty-display').addEventListener('change', updateTotal);
 
         async function checkVoucher() {
             const code = document.getElementById('voucher-input').value.trim();
@@ -174,21 +199,19 @@
                     body: JSON.stringify({ voucher_code: code })
                 });
                 const data = await res.json();
+
                 if (data.status === 'success') {
-                    currentDiscount = data.discount_amount;
-                    document.getElementById('discount-row').style.display = 'flex';
-                    document.getElementById('discount-amount').textContent = '- Rp ' + currentDiscount.toLocaleString('id-ID');
-                    document.getElementById('promo-label').textContent = 'Voucher';
+                    currentVoucherDiscount = data.discount_amount;
                     document.getElementById('form-voucher').value = code;
                     msg.textContent = data.message; msg.style.color = 'green';
                 } else {
-                    currentDiscount = 0;
+                    currentVoucherDiscount = 0;
                     document.getElementById('form-voucher').value = '';
                     msg.textContent = data.message; msg.style.color = 'red';
                 }
                 updateTotal();
             } catch(e) {
-                msg.textContent = 'Terjadi kesalahan.'; msg.style.color = 'red';
+                msg.textContent = 'Terjadi kesalahan jaringan.'; msg.style.color = 'red';
             }
         }
 
@@ -202,9 +225,8 @@
 
             document.getElementById('form-zone-id').value = zoneId;
             document.getElementById('btn-submit').disabled = false;
+
             document.getElementById('base-price-display').textContent = 'Rp ' + zonePrice.toLocaleString('id-ID');
-            document.getElementById('discount-row').style.display = 'none';
-            document.getElementById('final-price').textContent = 'Rp ' + zonePrice.toLocaleString('id-ID');
 
             const hint = document.getElementById('zone-hint');
             if (hint) hint.textContent = '* Zona dipilih: ' + zoneName;
@@ -213,23 +235,25 @@
         }
 
         function fetchHarga(zoneId, zonePrice) {
-            const url = `/tickets/{{ $ticket->id }}/calculate-price` + (zoneId ? `?zone_id=${zoneId}` : '');
-            fetch(url)
-                .then(r => r.json())
-                .then(data => {
-                    if (!data.success) return;
-                    const finalPrice = Number(data.final_price);
+        const url = `/tickets/{{ $ticket->id }}/calculate-price` + (zoneId ? `?zone_id=${zoneId}` : '');
+        fetch(url)
+            .then(r => r.json())
+            .then(data => {
+                if (!data.success) return;
+                document.getElementById('base-price-display').textContent = 'Rp ' + zonePrice.toLocaleString('id-ID');
+                currentTicketDiscount = Number(data.discount);
+
+                if (!data.success) return;
                     document.getElementById('base-price-display').textContent = 'Rp ' + zonePrice.toLocaleString('id-ID');
-                    document.getElementById('final-price').textContent = 'Rp ' + finalPrice.toLocaleString('id-ID');
-                    currentFinalPrice = finalPrice;
-                    if (data.discount > 0) {
-                        document.getElementById('discount-row').style.display = 'flex';
-                        document.getElementById('discount-amount').textContent = '- Rp ' + Number(data.discount).toLocaleString('id-ID');
-                        document.getElementById('promo-label').textContent = data.promo_name || 'Diskon';
-                    }
+
+                    currentTicketDiscount = Number(data.discount);
+                    if(data.promo_name) currentPromoName = data.promo_name;
+
                     updateTotal();
                 })
-                .catch(() => {});
+                .catch(() => {
+                    console.error("Gagal mengambil harga otomatis");
+                });
         }
 
         @if($ticket->ticket_type === 'entry_only')

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Voucher;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class RedeemController extends Controller
 {
@@ -14,7 +15,7 @@ class RedeemController extends Controller
         'required_points' => 'required|integer|min:1',
     ]);
 
-    $user = \App\Models\User::first();
+    $user = Auth::user();
     $pointsNeeded = $request->required_points;
 
     if ($user->points < $pointsNeeded) {
@@ -41,7 +42,7 @@ class RedeemController extends Controller
 
     public function myPoints()
     {
-    return view('points');
+        return view('points');
     }
 
 }
