@@ -62,7 +62,7 @@ class TicketTokenController extends Controller
         $request->validate([
             'booking_code' => 'required|string',
         ]);
-        
+
         //cari token pake booking code
         $token = TicketToken::with('orderItem.ticketZone.ticket')
             ->where('booking_code', $request->booking_code)

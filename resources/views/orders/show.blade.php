@@ -12,7 +12,7 @@
 
         <div class="bg-gradient-to-br from-gray-900 to-gray-700 p-6 text-white text-center">
             <h2 class="text-xs font-semibold tracking-widest uppercase opacity-80 mb-1">E-Ticket Masuk</h2>
-            <h1 class="text-2xl font-bold">Acara Apa ?</h1>
+            <h1 class="text-2xl font-bold">PRJ 2026</h1>
         </div>
 
         <div class="relative flex justify-between items-center px-4 -mt-3">
@@ -46,23 +46,39 @@
                 </div>
             </div>
 
-            <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col items-center">
-                @php $token = $order->items->first()?->token ?? null; @endphp
-                @if($token && $token->qr_code_path && file_exists(public_path($token->qr_code_path)))
+        @php
+            $allTokens = $order->items->flatMap(fn($item) => $item->tokens);
+        @endphp
+
+        @if($allTokens->isNotEmpty())
+            @foreach($allTokens as $idx => $token)
+            <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col items-center {{ $idx > 0 ? 'mt-4' : '' }}">
+                <p class="text-xs text-gray-400 mb-2">Tiket {{ $idx + 1 }} dari {{ $allTokens->count() }}</p>
+                @if($token->qr_code_path && file_exists(public_path($token->qr_code_path)))
                     <img src="{{ asset($token->qr_code_path) }}" alt="QR Code" class="w-40 h-40 mb-3">
                     <p class="text-xs font-mono tracking-widest text-gray-500">{{ $token->booking_code }}</p>
-                @elseif($order->status === 'paid')
-                    <p class="text-xs text-yellow-600 text-center">QR Code sedang digenerate, refresh sebentar lagi.</p>
-                @else
-                    <p class="text-xs text-gray-400 text-center">QR Code akan muncul setelah pembayaran selesai.</p>
+                    <p class="text-xs mt-1 {{ $token->status === 'valid' ? 'text-green-600' : 'text-gray-400' }}">
+                        {{ $token->status === 'valid' ? 'Belum digunakan' : 'Sudah digunakan' }}
+                    </p>
                 @endif
             </div>
-        </div>
+            @endforeach
+        @elseif($order->status === 'paid')
+            <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col items-center">
+                <p class="text-xs text-yellow-600 text-center">QR Code sedang digenerate, refresh sebentar lagi.</p>
+            </div>
+        @else
+            <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex flex-col items-center">
+                <p class="text-xs text-gray-400 text-center">QR Code akan muncul setelah pembayaran selesai.</p>
+            </div>
+        @endif
+            </div>
+
 
         <a href="/my-orders" class="block w-full text-center py-4 bg-gray-50 text-blue-600 font-semibold hover:bg-gray-100 transition border-t border-gray-100">
             Kembali ke Daftar Pesanan
         </a>
-    </div>
+
 
     @if($order->status == 'paid' || $order->status == 'success')
     <div class="p-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl mt-4">
@@ -82,6 +98,43 @@
         <p class="text-xs text-orange-600 font-bold">⏳ Pengajuan refund sedang direview Admin</p>
     </div>
 @endif
+
+<div style="background: #f9f9f9; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 20px;">
+            @if($order->status === 'pending')
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Selesaikan pembayaran untuk mendapatkan QR Code.</p>
+
+                {{-- Tombol Lanjutkan Pembayaran --}}
+                <button id="pay-button" style="background-color: #d00; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold;">
+                    Lanjutkan Pembayaran
+                </button>
+
+                {{-- Script Midtrans --}}
+                <script src="{{ env('MIDTRANS_IS_PRODUCTION') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
+                <script>
+                    document.getElementById('pay-button').onclick = function () {
+                        // Buka popup Midtrans
+                        snap.pay('{{ $snapToken }}', {
+                            onSuccess: function(result){
+                                // Jika sukses bayar, otomatis refresh halaman
+                                window.location.reload();
+                            },
+                            onPending: function(result){
+                                alert("Menunggu pembayaran Anda!");
+                                window.location.reload();
+                            },
+                            onError: function(result){
+                                alert("Pembayaran gagal!");
+                            },
+                            onClose: function(){
+                                console.log('Popup ditutup tanpa menyelesaikan pembayaran');
+                            }
+                        });
+                    };
+                </script>
+            @else
+                <p style="color: #666; font-size: 14px; margin: 0;">QR Code akan muncul setelah pembayaran selesai.</p>
+            @endif
+        </div>
 
 </body>
 </html>

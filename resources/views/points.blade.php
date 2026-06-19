@@ -11,15 +11,15 @@
     </style>
 </head>
 <body>
-    <h2>🎯 Point Reward</h2>
+    <h2>Point Reward</h2>
 
-    @php $user = \App\Models\User::first(); @endphp
+    @php $user = auth()->user(); @endphp
 
     @if(!$user)
-        <p style="color:red">❌ Tidak ada user di database.</p>
+        <p style="color:red"> Tidak ada user di database.</p>
     @else
-        <p>👤 User: <strong>{{ $user->name }}</strong></p>
-        <p>⭐ Poin kamu: <strong>{{ $user->points ?? 0 }}</strong></p>
+        <p>User: <strong>{{ $user->name }}</strong></p>
+        <p>Poin kamu: <strong>{{ $user->points ?? 0 }}</strong></p>
         <p><small>Info: Setiap Rp100.000 pembelian = 10 poin. Setiap 10 poin = diskon Rp10.000</small></p>
 
         <hr>
@@ -28,15 +28,15 @@
             @csrf
             <label>Jumlah Poin yang ditukar (kelipatan 10):</label>
             <input type="number" name="required_points" min="10" step="10" value="10">
-            <button type="submit">🔄 Tukar Poin</button>
+            <button type="submit"> Tukar Poin</button>
         </form>
 
         @if(session('success'))
-            <br><div class="success">✅ {{ session('success') }}</div>
+            <br><div class="success"> {{ session('success') }}</div>
         @endif
 
         @if(session('error'))
-            <br><div class="error">❌ {{ session('error') }}</div>
+            <br><div class="error"> {{ session('error') }}</div>
         @endif
     @endif
 </body>
