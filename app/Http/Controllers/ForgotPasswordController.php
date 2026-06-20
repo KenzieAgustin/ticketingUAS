@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\OtpMail;
 use App\Models\User;
 use App\Models\PasswordResetOtp;
+use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -80,9 +81,14 @@ class ForgotPasswordController extends Controller
         $user = User::where('email', $request->email)->first();
         $user->update(['password' => Hash::make($request->password)]);
 
-        // Hapus OTP setelah dipakai
         PasswordResetOtp::where('email', $request->email)->delete();
 
+        UserActivity::create([
+            'user_id'    => $user->id,
+            'action'     => 'reset_password',
+            'ip_address' => $request->ip(),
+        ]);
+        
         return redirect()->route('login')
             ->with('success', 'Password berhasil direset. Silakan login.');
     }
