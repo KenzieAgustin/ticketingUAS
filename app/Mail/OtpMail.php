@@ -17,14 +17,19 @@ class OtpMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public string $otp)
-    {
-        //
-    }
+    public function __construct(
+        public string $otp,
+        public string $type = 'reset_password'
+    ) {}
 
     public function build()
     {
-        return $this->subject('Kode OTP Reset Password - PRJ')
-            ->view('emails.otp');
+        $subject = $this->type === 'register'
+            ? 'Verifikasi Email - PRJ'
+            : 'Reset Password - PRJ';
+
+        return $this->subject($subject)
+            ->view('emails.otp')
+            ->with(['type' => $this->type]);
     }
 }
