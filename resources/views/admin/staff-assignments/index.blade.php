@@ -133,7 +133,7 @@
         @foreach($assignments as $a)
         <tr>
             <td style="text-align:center">{{ $loop->iteration }}</td>
-            <td>{{ $a->user->name ?? 'Unknown' }}</td>
+            <td>{{ $a->staff->name ?? 'Unknown' }}</td>
             <td>{{ $a->gate->name ?? '-' }} ({{ $a->gate->code ?? '' }})</td>
             <td>{{ \Carbon\Carbon::parse($a->assignment_date)->format('d M Y') }}</td>
             <td>{{ ucfirst(str_replace('_',' ',$a->shift)) }}</td>
