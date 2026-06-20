@@ -54,7 +54,7 @@ class CheckInController extends Controller
             bookingCode: $request->booking_code,
             gateId:      $request->gate_id,
             staffId:     $staff->id ?? null,
-            method:      $request->method ?? 'qr_scan',
+            method:      $request->input('method') ?? 'qr_scan',
         );
 
         $msg = $result['success'] ? $result['message'] : null;
