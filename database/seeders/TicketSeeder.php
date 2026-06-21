@@ -71,7 +71,7 @@ class TicketSeeder extends Seeder
 
         // Zones untuk entry only
         TicketZone::create([
-            'ticket_id'       => $entryOnly->id,
+            'ticket_id'       => $entryConcert->id,
             'zone_name'       => 'Festival Zone',
             'price'           => 150000,
             'quota_total'     => 500,
