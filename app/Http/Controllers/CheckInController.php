@@ -61,6 +61,7 @@ class CheckInController extends Controller
         $err = !$result['success'] ? $result['message'] : null;
 
         return redirect()->route('staff.check-ins.scan')
+            ->with('success', $msg)
             ->with('error', $err);
     }
 
