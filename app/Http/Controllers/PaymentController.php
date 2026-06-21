@@ -8,7 +8,10 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\TicketToken;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Mail\TicketPurchased;
+use Illuminate\Support\Facades\Mail;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
 
 class PaymentController extends Controller
 {
@@ -62,6 +65,17 @@ class PaymentController extends Controller
             // Generate token & QR untuk setiap order item
             $this->generateTokensForOrder($order);
 
+            // Kirim email e-tiket ke pembeli
+            $order->refresh();
+            if ($order->user && $order->user->email) {
+                try {
+                    Mail::to($order->user->email)->send(new TicketPurchased($order));
+                    \Log::info('Email tiket terkirim ke: ' . $order->user->email);
+                } catch (\Exception $e) {
+                    \Log::error('Gagal kirim email tiket: ' . $e->getMessage());
+                }
+            }
+
         } elseif ($request->transaction_status === 'expire') {
             $order->update(['status' => 'expired']);
 
@@ -91,34 +105,44 @@ class PaymentController extends Controller
         $items = OrderItem::where('order_id', $order->id)->get();
 
         foreach ($items as $item) {
-            // Skip kalau token sudah ada
-            if (TicketToken::where('order_item_id', $item->id)->exists()) {
+
+        // Hitung berapa token yang sudah ada untuk item ini
+            $existingCount = TicketToken::where('order_item_id', $item->id)->count();
+            $needed        = $item->quantity - $existingCount;
+
+            if ($needed <= 0) {
                 continue;
             }
 
-            // Generate booking code unik
-            do {
-                $bookingCode = 'PRJ2026-' . strtoupper(Str::random(6));
-            } while (TicketToken::where('booking_code', $bookingCode)->exists());
-
-            // Buat folder qrcodes kalau belum ada
+        // Buat folder qrcodes kalau belum ada
             if (!file_exists(public_path('qrcodes'))) {
                 mkdir(public_path('qrcodes'), 0777, true);
             }
 
-            $fileName = $bookingCode . '.png';
-            $path     = public_path('qrcodes/' . $fileName);
+            for ($i = 0; $i < $needed; $i++) {
 
-            QrCode::format('png')->size(250)->generate($bookingCode, $path);
+                // Generate booking code unik
+                do {
+                    $bookingCode = 'PRJ2026-' . strtoupper(Str::random(6));
+                } while (TicketToken::where('booking_code', $bookingCode)->exists());
 
-            TicketToken::create([
-                'order_item_id' => $item->id,
-                'booking_code'  => $bookingCode,
-                'qr_code_path'  => 'qrcodes/' . $fileName,
-                'status'        => 'valid',
-            ]);
+                $fileName = $bookingCode . '.png';
+                $path     = public_path('qrcodes/' . $fileName);
 
-            \Log::info('Token generated: ' . $bookingCode . ' untuk order item ' . $item->id);
+                $qrCode = new QrCode($bookingCode);
+                $writer = new PngWriter();
+                $result = $writer->write($qrCode);
+                file_put_contents($path, $result->getString());
+
+                TicketToken::create([
+                    'order_item_id' => $item->id,
+                    'booking_code'  => $bookingCode,
+                    'qr_code_path'  => 'qrcodes/' . $fileName,
+                    'status'        => 'valid',
+                ]);
+
+                \Log::info('Token generated: ' . $bookingCode . ' untuk order item ' . $item->id);
+            }
         }
     }
 }

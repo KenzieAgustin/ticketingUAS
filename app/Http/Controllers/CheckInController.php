@@ -46,7 +46,7 @@ class CheckInController extends Controller
         $request->validate([
             'booking_code' => 'required|string|max:100',
             'gate_id'      => 'required|integer|exists:gates,id',
-            'method'       => 'nullable|in:qr_scan,manual',
+            'method'       => 'nullable|in:qr_scan,manual_code',
         ]);
 
         $staff  = $request->user();
@@ -54,14 +54,13 @@ class CheckInController extends Controller
             bookingCode: $request->booking_code,
             gateId:      $request->gate_id,
             staffId:     $staff->id ?? null,
-            method:      $request->method ?? 'qr_scan',
+            method:      $request->input('method') ?? 'qr_scan',
         );
 
         $msg = $result['success'] ? $result['message'] : null;
         $err = !$result['success'] ? $result['message'] : null;
 
-        return redirect()->route('check-ins.index')
-            ->with('success', $msg)
+        return redirect()->route('staff.check-ins.scan')
             ->with('error', $err);
     }
 

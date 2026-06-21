@@ -21,12 +21,12 @@
 
 <nav>
     <a href="{{ route('home') }}">Home</a> |
-    <a href="{{ route('dashboard') }}">Dashboard</a> |
-    <a href="{{ route('gates.index') }}">Gate</a> |
-    <a href="{{ route('staff-assignments.index') }}">Jadwal Staff</a> |
-    <a href="{{ route('check-ins.index') }}">Check-in</a> |
-    <a href="{{ route('reviews.index') }}">Review</a> |
-    <a href="{{ route('sales-report.index') }}">Sales Report</a> |
+    <a href="{{ route('admin.dashboard') }}">Dashboard</a> |
+    <a href="{{ route('admin.gates.index') }}">Gate</a> |
+    <a href="{{ route('admin.staff-assignments.index') }}">Jadwal Staff</a> |
+    <a href="{{ route('admin.check-ins.index') }}">Check-in</a> |
+    <a href="{{ route('admin.reviews.index') }}">Review</a> |
+    <a href="{{ route('admin.sales-report.index') }}">Sales Report</a> |
     <form method="POST" action="{{ route('logout') }}" style="display:inline">
         @csrf
         <button type="submit" style="background:none;border:none;cursor:pointer;color:#c00;padding:0;font-size:14px">Logout</button>
@@ -57,7 +57,7 @@
 
 <div id="form-tambah" style="display:none">
     <h3>Tambah Gate Baru</h3>
-    <form method="POST" action="{{ route('gates.store') }}">
+    <form method="POST" action="{{ route('admin.gates.store') }}">
         @csrf
         Kode: <input type="text" name="code" required><br><br>
         Nama: <input type="text" name="name" required><br><br>
@@ -96,7 +96,7 @@
         @endforeach
     </select>
     <button type="submit">Filter</button>
-    <a href="{{ route('gates.index') }}">Reset</a>
+    <a href="{{ route('admin.gates.index') }}">Reset</a>
 </form>
 <br>
 
@@ -112,15 +112,15 @@
         <tr>
             <td style="text-align:center">{{ $loop->iteration }}</td>
             <td>{{ $gate->code }}</td>
-            <td><a href="{{ route('gates.show', $gate) }}">{{ $gate->name }}</a></td>
+            <td><a href="{{ route('admin.gates.show', $gate) }}">{{ $gate->name }}</a></td>
             <td>{{ ucfirst($gate->type) }}</td>
             <td>{{ ucfirst($gate->status) }}</td>
             <td>{{ $gate->staff_assignments_count }}</td>
             <td>{{ $gate->check_ins_count }}</td>
             <td>
-                <a href="{{ route('gates.show', $gate) }}">Detail</a> |
+                <a href="{{ route('admin.gates.show', $gate) }}">Detail</a> |
                 <a href="#" onclick="document.getElementById('edit-{{ $gate->id }}').style.display='block'">Edit</a> |
-                <form action="{{ route('gates.destroy', $gate) }}" method="POST" style="display:inline" onsubmit="return confirm('Hapus gate ini?')">
+                <form action="{{ route('admin.gates.destroy', $gate) }}" method="POST" style="display:inline" onsubmit="return confirm('Hapus gate ini?')">
                     @csrf @method('DELETE')
                     <button type="submit">Hapus</button>
                 </form>
@@ -128,7 +128,7 @@
         </tr>
         <tr id="edit-{{ $gate->id }}" style="display:none;background:#f5f5f5">
             <td colspan="8">
-                <form method="POST" action="{{ route('gates.update', $gate) }}">
+                <form method="POST" action="{{ route('admin.gates.update', $gate) }}">
                     @csrf @method('PUT')
                     Kode: <input type="text" name="code" value="{{ $gate->code }}" required>
                     Nama: <input type="text" name="name" value="{{ $gate->name }}" required>

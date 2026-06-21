@@ -16,7 +16,7 @@ class RedeemController extends Controller
         'required_points' => 'required|integer|min:1',
     ]);
 
-    $user = Auth::user();;
+    $user = Auth::user();
     $pointsNeeded = $request->required_points;
 
     if ($user->points < $pointsNeeded) {
@@ -50,7 +50,7 @@ class RedeemController extends Controller
 
     public function myPoints()
     {
-    return view('points');
+        return view('points');
     }
 
 }

@@ -20,12 +20,12 @@
 
 <nav>
     <a href="{{ route('home') }}">Home</a> |
-    <a href="{{ route('dashboard') }}">Dashboard</a> |
-    <a href="{{ route('gates.index') }}">Gate</a> |
-    <a href="{{ route('staff-assignments.index') }}">Jadwal Staff</a> |
-    <a href="{{ route('check-ins.index') }}">Check-in</a> |
-    <a href="{{ route('reviews.index') }}">Review</a> |
-    <a href="{{ route('sales-report.index') }}">Sales Report</a> |
+    <a href="{{ route('admin.dashboard') }}">Dashboard</a> |
+    <a href="{{ route('admin.gates.index') }}">Gate</a> |
+    <a href="{{ route('admin.staff-assignments.index') }}">Jadwal Staff</a> |
+    <a href="{{ route('admin.check-ins.index') }}">Check-in</a> |
+    <a href="{{ route('admin.reviews.index') }}">Review</a> |
+    <a href="{{ route('admin.sales-report.index') }}">Sales Report</a> |
     <form method="POST" action="{{ route('logout') }}" style="display:inline">
         @csrf
         <button type="submit" style="background:none;border:none;cursor:pointer;color:#c00;padding:0;font-size:14px">Logout</button>
@@ -62,7 +62,7 @@
         @endfor
     </select>
     <button type="submit">Filter</button>
-    <a href="{{ route('reviews.index') }}">Reset</a>
+    <a href="{{ route('admin.reviews.index') }}">Reset</a>
 </form>
 <br>
 
@@ -86,10 +86,10 @@
             <td>{{ $review->title ?? '-' }}</td>
             <td>{{ Str::limit($review->body, 60) }}</td>
             <td>{{ ucfirst($review->status) }}</td>
-            <td>{{ $review->created_at->format('d M Y') }}</td>
+            <td>{{ $review->created_at ? $review->created_at->format('d M Y') : '-' }}</td>
             <td>
                 @if($review->status === 'pending')
-                    <form action="{{ route('reviews.approve', $review) }}" method="POST" style="display:inline">
+                    <form action="{{ route('admin.reviews.approve', $review) }}" method="POST" style="display:inline">
                         @csrf @method('PATCH')
                         <button type="submit">Setujui</button>
                     </form>
@@ -102,7 +102,7 @@
         </tr>
         <tr id="tolak-{{ $review->id }}" style="display:none;background:#f5f5f5">
             <td colspan="9">
-                <form method="POST" action="{{ route('reviews.reject', $review) }}">
+                <form method="POST" action="{{ route('admin.reviews.reject', $review) }}">
                     @csrf @method('PATCH')
                     Alasan penolakan: <input type="text" name="reason" required style="width:300px">
                     <button type="submit">Tolak</button>

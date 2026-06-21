@@ -40,7 +40,7 @@
     <div class="alert-error">{{ session('error') }}</div>
 @endif
 
-<form method="POST" action="{{ route('check-ins.scan') }}">
+<form method="POST" action="{{ route('staff.check-ins.scan') }}">
     @csrf
     Kode Booking: <input type="text" name="booking_code" required placeholder="Ketik atau scan..." autofocus><br><br>
     Gate:
@@ -53,7 +53,7 @@
     Metode:
     <select name="method">
         <option value="qr_scan">QR Scan</option>
-        <option value="manual">Manual</option>
+        <option value="manual_code">Manual Code</option>
     </select><br><br>
     <button type="submit">Proses Check-in</button>
 </form>
