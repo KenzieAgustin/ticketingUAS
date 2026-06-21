@@ -53,7 +53,7 @@
     Metode:
     <select name="method">
         <option value="qr_scan">QR Scan</option>
-        <option value="manual">Manual</option>
+        <option value="manual_code">Manual Code</option>
     </select><br><br>
     <button type="submit">Proses Check-in</button>
 </form>

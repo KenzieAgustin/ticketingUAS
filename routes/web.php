@@ -9,6 +9,7 @@ use App\Http\Controllers\RedeemController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Web\StageWebController;
 use App\Http\Controllers\Web\EventCategoryWebController;
@@ -36,8 +37,22 @@ Route::get('/', fn() => redirect()->route('login'));
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+
+    Route::get('/verify-register-otp', [AuthController::class, 'showVerifyRegisterOtp'])->name('register.verify-otp.show');
+    Route::post('/verify-register-otp', [AuthController::class, 'verifyRegisterOtp'])->name('register.verify-otp');
+    Route::post('/resend-register-otp', [AuthController::class, 'resendRegisterOtp'])->name('register.resend-otp');
+
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
+    
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgot'])->name('password.forgot');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendOtp'])->name('password.send-otp');
+
+    Route::get('/verify-otp', [ForgotPasswordController::class, 'showVerifyOtp'])->name('password.verify-otp.show');
+    Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp'])->name('password.verify-otp');
+
+    Route::get('/reset-password', [ForgotPasswordController::class, 'showReset'])->name('password.reset.show');
+    Route::post('/reset-password', [ForgotPasswordController::class, 'reset'])->name('password.reset');
 });
 
 // Auth

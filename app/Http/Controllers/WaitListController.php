@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\WaitList;
 use App\Models\TicketZone;
+use App\Notifications\AppNotification;
 use Illuminate\Http\Request;
 
 class WaitListController extends Controller
@@ -43,6 +44,13 @@ class WaitListController extends Controller
             'ticket_zone_id' => $request->ticket_zone_id,
             'status' => 'waiting',
         ]);
+
+        // Mancing notif
+        auth()->user()->notify(new AppNotification(
+            type: 'waitlist_joined',
+            message: '📋 Kamu berhasil masuk antrian untuk zona ' . $zone->zone_name . '. Kami akan notif kalau ada slot!',
+            refId: $waitList->id,
+        ));
 
         return response()->json([
             'success' => true,

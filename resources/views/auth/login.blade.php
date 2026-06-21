@@ -41,7 +41,9 @@
 
         <label style="font-size:14px">
             <input type="checkbox" name="remember"> Ingat saya
-        </label><br><br>
+        </label>
+        <a href="{{ route('password.forgot') }}" style="font-size:13px; float:right; color:#888;">Lupa password?</a>
+        <br><br>
 
         <button type="submit">Login</button>
     </form>
