@@ -11,7 +11,7 @@ use App\Models\TicketZone;
 use App\Models\Ticket;
 use App\Models\Voucher;
 use App\Models\WaitList;
-use App\Notifications\AppNotification;
+use App\Notifications\OrderNotification;
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -120,7 +120,7 @@ class OrderController extends Controller
             });
 
             // Mancing notif
-            Auth::user()->notify(new AppNotification(
+            Auth::user()->notify(new OrderNotification(
                 type: 'order_created',
                 message: '🧾 Pesanan #' . $order->order_number . ' berhasil dibuat. Segera selesaikan pembayaran!',
                 refId: $order->id,
