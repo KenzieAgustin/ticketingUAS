@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Mail\OtpMail;
+use App\Models\Otp;
 use App\Models\User;
 use App\Models\UserActivity;
-use App\Models\Otp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -22,15 +22,14 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
-
-        // Cek apakah email sudah ada tapi belum verified
-        $existingUser = User::where('email', $request->email)
+        // Kalau ada akun lama dengan email sama tapi belum verifikasi
+        // hapus dulu biar user bisa daftar ulang
+        $existingUnverified = User::where('email', $request->email)
             ->whereNull('email_verified_at')
             ->first();
 
-        // Kalau ada akun lama yang belum verified, hapus dulu
-        if ($existingUser) {
-            $existingUser->delete();
+        if ($existingUnverified) {
+            $existingUnverified->delete();
         }
 
         $user = User::create([
@@ -79,6 +78,7 @@ class AuthController extends Controller
             return back()->withErrors(['otp' => 'Kode OTP sudah kadaluarsa.']);
         }
 
+        // Kalo OTP cocok tandain email user udah verified
         $user = User::where('email', $request->email)->first();
         $user->update(['email_verified_at' => now()]);
 
@@ -116,14 +116,26 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
+        // Belum verifikasi email gaboleh login dulu
         if ($user && !$user->email_verified_at) {
             return back()->withErrors([
                 'email' => 'Email belum diverifikasi. Silakan cek email kamu.',
             ])->onlyInput('email');
         }
 
+        // Akun lagi dikunci karena kebanyakan gagal login
+        if ($user && $user->isLocked()) {
+            $minutes = $user->lockoutMinutesRemaining();
+            return back()->withErrors([
+                'email' => "Akun terkunci karena terlalu banyak percobaan gagal. Coba lagi dalam {$minutes} menit.",
+            ])->onlyInput('email');
+        }
+
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+
+            // Login sukses reset counter gagal login
+            $user->resetFailedAttempts();
 
             UserActivity::create([
                 'user_id'    => Auth::id(),
@@ -132,6 +144,24 @@ class AuthController extends Controller
             ]);
 
             return redirect()->intended('/home');
+        }
+
+        // Password salah tambah counter gagal login
+        if ($user) {
+            $user->incrementFailedAttempts();
+
+            $remainingAttempts = max(0, 5 - $user->failed_login_attempts);
+
+            // Lock akun kalo udah 5 kali gagal
+            if ($user->isLocked()) {
+                return back()->withErrors([
+                    'email' => 'Akun terkunci karena terlalu banyak percobaan gagal. Coba lagi dalam 15 menit.',
+                ])->onlyInput('email');
+            }
+
+            return back()->withErrors([
+                'email' => "Email atau password salah. Percobaan tersisa: {$remainingAttempts}.",
+            ])->onlyInput('email');
         }
 
         return back()->withErrors([
