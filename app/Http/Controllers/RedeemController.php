@@ -38,19 +38,23 @@ class RedeemController extends Controller
 
     $user->decrement('points', $pointsNeeded);
 
-    // Mancing notif
-    $user->notify(new AppNotification(
-        type: 'points_redeemed',
-        message: '🎁 Poin berhasil ditukar! Voucher ' . $voucher->code . ' senilai Rp' . number_format($discountAmount) . ' aktif selama 30 hari.',
-        refId: $voucher->id,
-    ));
+    \App\Models\PointHistory::create([
+        'user_id'     => $user->id,
+        'amount'      => -$pointsNeeded, // Dicatat minus agar jelas ini pengeluaran
+        'type'        => 'spend', // Sesuai dengan enum migration
+        'description' => 'Tukar poin dengan voucher ' . $voucher->code,
+    ]);
 
     return back()->with('success', 'Berhasil! Kode voucher kamu: ' . $voucher->code . ' (diskon Rp' . number_format($discountAmount) . ')');
     }
 
     public function myPoints()
     {
-        return view('points');
+        $histories = \App\Models\PointHistory::where('user_id', \Illuminate\Support\Facades\Auth::id())
+                                             ->orderBy('created_at', 'desc')
+                                             ->get();
+
+        return view('points', compact('histories'));
     }
 
 }
