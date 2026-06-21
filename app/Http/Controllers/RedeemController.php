@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Voucher;
+use App\Notifications\AppNotification;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 

@@ -86,7 +86,7 @@
             <td>{{ $review->title ?? '-' }}</td>
             <td>{{ Str::limit($review->body, 60) }}</td>
             <td>{{ ucfirst($review->status) }}</td>
-            <td>{{ $review->created_at->format('d M Y') }}</td>
+            <td>{{ $review->created_at ? $review->created_at->format('d M Y') : '-' }}</td>
             <td>
                 @if($review->status === 'pending')
                     <form action="{{ route('admin.reviews.approve', $review) }}" method="POST" style="display:inline">

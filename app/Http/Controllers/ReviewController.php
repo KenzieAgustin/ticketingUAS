@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Review;
+use App\Notifications\AppNotification;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
@@ -36,6 +37,12 @@ class ReviewController extends Controller
             'approved_at' => now(),
         ]);
 
+        $review->user->notify(new AppNotification(
+            type: 'review_approved',
+            message: '⭐ Ulasan kamu telah disetujui dan dipublikasikan!',
+            refId: $review->id,
+        ));
+
         return redirect()->route('admin.reviews.index')->with('success', 'Ulasan berhasil disetujui.');
     }
 
@@ -48,6 +55,13 @@ class ReviewController extends Controller
             'status'          => 'rejected',
             'rejected_reason' => $request->reason,
         ]);
+
+        // Mancing notif
+        $review->user->notify(new AppNotification(
+            type: 'review_rejected',
+            message: '🚫 Ulasan kamu ditolak. Alasan: ' . $request->reason,
+            refId: $review->id,
+        ));
 
         return redirect()->route('admin.reviews.index')->with('success', 'Ulasan berhasil ditolak.');
     }

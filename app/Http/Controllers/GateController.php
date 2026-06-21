@@ -27,7 +27,7 @@ class GateController extends Controller
     {
         Gate::create($request->validated());
 
-        return redirect()->route('gates.index')->with('success', 'Gate berhasil dibuat.');
+        return redirect()->route('admin.gates.index')->with('success', 'Gate berhasil dibuat.');
     }
 
     // GET /gates/{gate}
@@ -43,7 +43,7 @@ class GateController extends Controller
     {
         $gate->update($request->validated());
 
-        return redirect()->route('gates.index')->with('success', 'Gate berhasil diperbarui.');
+        return redirect()->route('admin.gates.index')->with('success', 'Gate berhasil diperbarui.');
     }
 
     // DELETE /gates/{gate}
@@ -51,7 +51,7 @@ class GateController extends Controller
     {
         $gate->delete();
 
-        return redirect()->route('gates.index')->with('success', 'Gate berhasil dihapus.');
+        return redirect()->route('admin.gates.index')->with('success', 'Gate berhasil dihapus.');
     }
 
     // GET /staff/gates
