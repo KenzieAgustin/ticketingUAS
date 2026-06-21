@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
 use App\Models\TicketToken;
+use App\Notifications\AppNotification;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Http\Request;
@@ -52,6 +53,14 @@ class TicketTokenController extends Controller
             'qr_code_path'  => 'qrcodes/' . $fileName,
             'status'        => 'valid',
         ]);
+
+        // Ngambil user dari order item buat mancing notif
+        $orderItem = \App\Models\OrderItem::find($request->order_item_id);
+        $orderItem?->order?->user?->notify(new AppNotification(
+            type: 'ticket_generated',
+            message: '🎫 Tiket kamu dengan kode ' . $bookingCode . ' berhasil dibuat. Tunjukkan QR code saat masuk!',
+            refId: $token->id,
+        ));
 
         return response()->json([
             'success' => true,

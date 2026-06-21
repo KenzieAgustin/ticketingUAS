@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Voucher;
+use App\Notifications\AppNotification;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
@@ -36,6 +37,13 @@ class RedeemController extends Controller
     ]);
 
     $user->decrement('points', $pointsNeeded);
+
+    // Mancing notif
+    $user->notify(new AppNotification(
+        type: 'points_redeemed',
+        message: '🎁 Poin berhasil ditukar! Voucher ' . $voucher->code . ' senilai Rp' . number_format($discountAmount) . ' aktif selama 30 hari.',
+        refId: $voucher->id,
+    ));
 
     return back()->with('success', 'Berhasil! Kode voucher kamu: ' . $voucher->code . ' (diskon Rp' . number_format($discountAmount) . ')');
     }

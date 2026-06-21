@@ -11,6 +11,7 @@ use App\Models\TicketZone;
 use App\Models\Ticket;
 use App\Models\Voucher;
 use App\Models\WaitList;
+use App\Notifications\AppNotification;
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -117,6 +118,13 @@ class OrderController extends Controller
                     'subtotal'       => $hargaSatuan * $quantity,
                 ]);
             });
+
+            // Mancing notif
+            Auth::user()->notify(new AppNotification(
+                type: 'order_created',
+                message: '🧾 Pesanan #' . $order->order_number . ' berhasil dibuat. Segera selesaikan pembayaran!',
+                refId: $order->id,
+            ));
 
             // Midtrans
             Config::$serverKey    = env('MIDTRANS_SERVER_KEY');
