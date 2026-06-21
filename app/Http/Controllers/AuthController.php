@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Mail\OtpMail;
-use App\Models\PasswordResetOtp;
 use App\Models\User;
 use App\Models\UserActivity;
+use App\Models\Otp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -22,6 +22,17 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
+
+        // Cek apakah email sudah ada tapi belum verified
+        $existingUser = User::where('email', $request->email)
+            ->whereNull('email_verified_at')
+            ->first();
+
+        // Kalau ada akun lama yang belum verified, hapus dulu
+        if ($existingUser) {
+            $existingUser->delete();
+        }
+
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
@@ -30,7 +41,7 @@ class AuthController extends Controller
 
         $otp = rand(100000, 999999);
 
-        PasswordResetOtp::updateOrCreate(
+        Otp::updateOrCreate(
             ['email' => $request->email],
             [
                 'otp'        => $otp,
@@ -56,7 +67,7 @@ class AuthController extends Controller
             'otp'   => ['required', 'digits:6'],
         ]);
 
-        $record = PasswordResetOtp::where('email', $request->email)
+        $record = Otp::where('email', $request->email)
             ->where('otp', $request->otp)
             ->first();
 
@@ -71,7 +82,7 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
         $user->update(['email_verified_at' => now()]);
 
-        PasswordResetOtp::where('email', $request->email)->delete();
+        Otp::where('email', $request->email)->delete();
 
         return redirect()->route('login')
             ->with('success', 'Email berhasil diverifikasi! Silakan login.');
@@ -83,7 +94,7 @@ class AuthController extends Controller
 
         $otp = rand(100000, 999999);
 
-        PasswordResetOtp::updateOrCreate(
+        Otp::updateOrCreate(
             ['email' => $request->email],
             ['otp' => $otp, 'expires_at' => now()->addMinutes(10)]
         );
