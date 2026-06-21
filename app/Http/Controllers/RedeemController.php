@@ -37,12 +37,23 @@ class RedeemController extends Controller
 
     $user->decrement('points', $pointsNeeded);
 
+    \App\Models\PointHistory::create([
+        'user_id'     => $user->id,
+        'amount'      => -$pointsNeeded, // Dicatat minus agar jelas ini pengeluaran
+        'type'        => 'spend', // Sesuai dengan enum migration
+        'description' => 'Tukar poin dengan voucher ' . $voucher->code,
+    ]);
+
     return back()->with('success', 'Berhasil! Kode voucher kamu: ' . $voucher->code . ' (diskon Rp' . number_format($discountAmount) . ')');
     }
 
     public function myPoints()
     {
-        return view('points');
+        $histories = \App\Models\PointHistory::where('user_id', \Illuminate\Support\Facades\Auth::id())
+                                             ->orderBy('created_at', 'desc')
+                                             ->get();
+
+        return view('points', compact('histories'));
     }
 
 }
