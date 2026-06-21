@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('password_reset_otps', function (Blueprint $table) {
+        Schema::create('otps', function (Blueprint $table) {
             $table->id();
             $table->string('email');
             $table->string('otp', 6);
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('password_reset_otps');
+        Schema::dropIfExists('otps');
     }
 };

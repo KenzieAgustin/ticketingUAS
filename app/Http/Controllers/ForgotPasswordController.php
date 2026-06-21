@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Mail\OtpMail;
 use App\Models\User;
-use App\Models\PasswordResetOtp;
 use App\Models\UserActivity;
+use App\Models\Otp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -25,7 +25,7 @@ class ForgotPasswordController extends Controller
 
         $otp = rand(100000, 999999);
 
-        PasswordResetOtp::updateOrCreate(
+        Otp::updateOrCreate(
             ['email' => $request->email],
             [
                 'otp' => $otp,
@@ -51,7 +51,7 @@ class ForgotPasswordController extends Controller
             'otp'   => ['required', 'digits:6'],
         ]);
 
-        $record = PasswordResetOtp::where('email', $request->email)
+        $record = Otp::where('email', $request->email)
             ->where('otp', $request->otp)
             ->first();
 
@@ -81,7 +81,7 @@ class ForgotPasswordController extends Controller
         $user = User::where('email', $request->email)->first();
         $user->update(['password' => Hash::make($request->password)]);
 
-        PasswordResetOtp::where('email', $request->email)->delete();
+        Otp::where('email', $request->email)->delete();
 
         UserActivity::create([
             'user_id'    => $user->id,
