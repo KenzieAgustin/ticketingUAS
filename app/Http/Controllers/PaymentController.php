@@ -98,25 +98,30 @@ class PaymentController extends Controller
         $items = OrderItem::where('order_id', $order->id)->get();
 
         foreach ($items as $item) {
-            // Skip kalau token sudah ada
-            if (TicketToken::where('order_item_id', $item->id)->exists()) {
+            $existingCount = TicketToken::where('order_item_id', $item->id)->count();
+
+            if ($existingCount >= $item->quantity) {
                 continue;
             }
 
+            $tokensToCreate = $item->quantity - $existingCount;
+
+            for ($i = 0; $i < $tokensToCreate; $i++) {
             // Generate booking code unik
             do {
                 $bookingCode = 'PRJ2026-' . strtoupper(Str::random(6));
             } while (TicketToken::where('booking_code', $bookingCode)->exists());
+
 
             // Buat folder qrcodes kalau belum ada
             if (!file_exists(public_path('qrcodes'))) {
                 mkdir(public_path('qrcodes'), 0777, true);
             }
 
-            $fileName = $bookingCode . '.svg';
+            $fileName = $bookingCode . '.png';
             $path     = public_path('qrcodes/' . $fileName);
 
-            $svgContent = QrCode::format('svg')->size(250)->generate($bookingCode);
+            $svgContent = QrCode::format('png')->size(250)->generate($bookingCode);
             file_put_contents($path, $svgContent);
 
             TicketToken::create([
@@ -127,6 +132,7 @@ class PaymentController extends Controller
             ]);
 
             \Log::info('Token generated: ' . $bookingCode . ' untuk order item ' . $item->id);
+            }
         }
     }
 }

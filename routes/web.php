@@ -154,3 +154,14 @@ Route::middleware(['auth', 'role:admin,staff_gate'])->prefix('staff')->name('sta
     Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan.post');
 
 });
+
+//http://localhost:8000/debug/fix-tokens/PRJ-xxxx
+Route::get('/debug/fix-tokens/{orderNumber}', function ($orderNumber) {
+    $order = App\Models\Order::where('order_number', $orderNumber)->firstOrFail();
+    $controller = new App\Http\Controllers\PaymentController();
+    $method = new ReflectionMethod($controller, 'generateTokensForOrder');
+    $method->setAccessible(true);
+    $method->invoke($controller, $order);
+    return 'Done. Tokens: ' . $order->items->load('tokens')->flatMap(fn($i) => $i->tokens)->count();
+});
+
