@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OrderNotification extends Notification
+class AppNotification extends Notification
 {
     use Queueable;
 
@@ -19,7 +19,7 @@ class OrderNotification extends Notification
         public readonly string $message,
         public readonly ?int   $refId = null,
     ){}
-    
+
 
     /**
      * Get the notification's delivery channels.

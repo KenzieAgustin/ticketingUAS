@@ -45,7 +45,8 @@ class PaymentController extends Controller
             // Tambah poin user
             $user = $order->user;
             if ($user) {
-                $pointsEarned = floor($order->total_amount / 100000) * 10;
+                $basisPoin    = $order->gross_amount ?? $order->total_amount;
+                $pointsEarned = floor($basisPoin / 100000) * 10;
                 if ($pointsEarned > 0) {
                     $user->increment('points', $pointsEarned);
                 }
@@ -62,12 +63,14 @@ class PaymentController extends Controller
                 ]
             );
 
-            \App\Models\PointHistory::create([
-                        'user_id'     => $user->id,
-                        'amount'      => $pointsEarned,
-                        'type'        => 'earn', // Sesuai dengan enum migration
-                        'description' => 'Mendapatkan poin dari pesanan ' . $order->order_number,
-                    ]);
+            if($pointsEarned > 0){
+                \App\Models\PointHistory::create([
+                    'user_id'     => $user->id,
+                    'amount'      => $pointsEarned,
+                    'type'        => 'earn',
+                    'description' => 'Mendapatkan poin dari pesanan ' . $order->order_number,
+                ]);
+            }
 
             // Generate token & QR untuk setiap order item
             $this->generateTokensForOrder($order);
