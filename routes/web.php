@@ -123,7 +123,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/activities', [AdminController::class, 'activities'])->name('activities.index');
 
     // Ticket admin
-    Route::get('/tickets', [TicketController::class, 'adminWeb']);
+    Route::get('/tickets', [TicketController::class, 'adminWeb'])->name('tickets.index');
     Route::get('/tracker', [QuotaTrackerController::class, 'indexWeb'])->name('tracker.index');
 
     // Refund
