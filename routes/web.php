@@ -44,7 +44,7 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
-    
+
     Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgot'])->name('password.forgot');
     Route::post('/forgot-password', [ForgotPasswordController::class, 'sendOtp'])->name('password.send-otp');
 
@@ -77,25 +77,25 @@ Route::middleware('auth')->group(function () {
     });
 
     // Ticket & Token module
-    Route::get('/tickets', [TicketController::class, 'indexWeb']);
-    Route::post('/tickets', [TicketController::class, 'store']);
-    Route::get('/tickets/{id}/buy', [TicketController::class, 'buyWeb']);
-    Route::post('/tokens/validate', [TicketTokenController::class, 'validateToken']);
-    Route::post('/tokens/generate', [TicketTokenController::class, 'generateToken']);
-    Route::get('/zones/{ticket_id}', [TicketZoneController::class, 'getZoneByTicket']);
-    Route::post('/zones/reduce', [TicketZoneController::class, 'reduceQuota']);
-    Route::get('/tickets/{id}/calculate-price', [PricingRuleController::class, 'calculateFinalPrice']);
-    Route::post('/waitlist/join', [WaitListController::class, 'joinWaitList']);
+    Route::get('/tickets', [TicketController::class, 'indexWeb'])->name('tickets.index');
+    Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
+    Route::get('/tickets/{id}/buy', [TicketController::class, 'buyWeb'])->name('tickets.buy');
+    Route::post('/tokens/validate', [TicketTokenController::class, 'validateToken'])->name('tokens.validate');
+    Route::post('/tokens/generate', [TicketTokenController::class, 'generateToken'])->name('tokens.generate');
+    Route::get('/zones/{ticket_id}', [TicketZoneController::class, 'getZoneByTicket'])->name('zones.by-ticket');
+    Route::post('/zones/reduce', [TicketZoneController::class, 'reduceQuota'])->name('zones.reduce');
+    Route::get('/tickets/{id}/calculate-price', [PricingRuleController::class, 'calculateFinalPrice'])->name('tickets.calculate-price');
+    Route::post('/waitlist/join', [WaitListController::class, 'joinWaitList'])->name('waitlist.join');
 
-    // Order payment
+    // Order & Payment
     Route::get('/my-orders', [OrderController::class, 'index'])->name('order.index');
     Route::get('/my-orders/{id}', [OrderController::class, 'show'])->name('order.show');
-    Route::post('/checkout', [OrderController::class, 'checkout']);
-    Route::get('/checkout', fn() => view('checkout'));
+    Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout.store');
+    Route::get('/checkout', fn() => view('checkout'))->name('checkout.index');
     Route::post('/check-voucher', [OrderController::class, 'checkVoucher'])->name('check.voucher');
     Route::post('/order/{id}/refund', [RefundController::class, 'store'])->name('refund.store');
-    Route::get('/points', [RedeemController::class, 'myPoints']);
-    Route::post('/redeem', [RedeemController::class, 'redeem']);
+    Route::get('/points', [RedeemController::class, 'myPoints'])->name('points.index');
+    Route::post('/redeem', [RedeemController::class, 'redeem'])->name('redeem.store');
 
     // Event & Konser
     Route::resource('stages', StageWebController::class)->names('web.stages');
@@ -105,11 +105,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('event-schedules', EventScheduleWebController::class)->names('web.event-schedules');
     Route::resource('event-media', EventMediaWebController::class)->names('web.event-media');
 
-    // Operational & Report
-    Route::get('/gates', [GateController::class, 'index']);
-    Route::post('/reviews', [ReviewController::class, 'store']);
-    Route::get('/reviews', [ReviewController::class, 'index']);
-
+    // Reviews (customer)
     Route::get('/reviews', [ReviewController::class, 'customerIndex'])->name('reviews.index');
     Route::get('/reviews/create', [ReviewController::class, 'create'])->name('reviews.create');
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
@@ -133,54 +129,54 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Operational & Report
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/summary', [DashboardController::class, 'summary']);
+    Route::get('/dashboard/summary', [DashboardController::class, 'summary'])->name('dashboard.summary');
     Route::get('/sales-report', [SalesReportController::class, 'index'])->name('sales-report.index');
     Route::get('/operational', [DashboardController::class, 'index'])->name('operational');
 
-    // Gates
-    Route::get('/gates', [GateController::class, 'index'])->name('gates.index');
-    Route::post('/gates', [GateController::class, 'store']);
-    Route::put('/gates/{gate}', [GateController::class, 'update']);
-    Route::delete('/gates/{gate}', [GateController::class, 'destroy']);
-    Route::resource('gates', GateController::class)->except(['create', 'edit']);
+    // Gates — pakai resource, manual routes dihapus karena redundan
+    Route::resource('gates', GateController::class)->except(['create', 'edit'])->names('gates');
 
-    // Staff assignment
-    Route::get('/staff-assignments', [StaffAssignmentController::class, 'index'])->name('staff-assignments.index');
-    Route::post('/staff-assignments', [StaffAssignmentController::class, 'store']);
-    Route::delete('/staff-assignments/{staffAssignment}', [StaffAssignmentController::class, 'destroy']);
-    Route::patch('/staff-assignments/{staffAssignment}/status', [StaffAssignmentController::class, 'updateStatus'])->name('staff-assignments.updateStatus');
-    Route::resource('staff-assignments', StaffAssignmentController::class)->except(['create', 'edit', 'show']);
+    // Staff assignments — pakai resource, manual routes dihapus karena redundan
+    Route::resource('staff-assignments', StaffAssignmentController::class)
+        ->except(['create', 'edit', 'show'])
+        ->names('staff-assignments');
+    Route::patch('/staff-assignments/{staffAssignment}/status', [StaffAssignmentController::class, 'updateStatus'])
+        ->name('staff-assignments.updateStatus');
 
     // Check-ins
     Route::get('/check-ins', [CheckInController::class, 'index'])->name('check-ins.index');
     Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan');
 
-    // Reviews
+    // Reviews (admin)
     Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('reviews.index');
     Route::patch('/reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
     Route::patch('/reviews/{review}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
-
 });
 
 // Staff gate
 Route::middleware(['auth', 'role:admin,staff_gate'])->prefix('staff')->name('staff.')->group(function () {
-    // Ticket & Token module
-    Route::get('/scan', [TicketTokenController::class, 'scanWeb']);
-
     Route::get('/scan', [TicketTokenController::class, 'scanWeb'])->name('scan');
     Route::get('/gates', [GateController::class, 'staffIndex'])->name('gates.index');
     Route::get('/check-ins/scan', [CheckInController::class, 'staffScan'])->name('check-ins.scan');
     Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan.post');
-
 });
 
-//http://localhost:8000/debug/fix-tokens/PRJ-xxxx
-Route::get('/debug/fix-tokens/{orderNumber}', function ($orderNumber) {
-    $order = App\Models\Order::where('order_number', $orderNumber)->firstOrFail();
-    $controller = new App\Http\Controllers\PaymentController();
-    $method = new ReflectionMethod($controller, 'generateTokensForOrder');
-    $method->setAccessible(true);
-    $method->invoke($controller, $order);
-    return 'Done. Tokens: ' . $order->items->load('tokens')->flatMap(fn($i) => $i->tokens)->count();
-});
+// Debug  emergency tool khusus admin, hanya aktif di environment local/development.
+// Gunakan ini kalau ada order yang tokennya gagal generate (misal webhook Midtrans timeout).
+// Contoh: /debug/fix-tokens/PRJ-XXXXXX
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/debug/fix-tokens/{orderNumber}', function ($orderNumber) {
+        if (!app()->isLocal()) {
+            abort(404);
+        }
 
+        $order = App\Models\Order::where('order_number', $orderNumber)->firstOrFail();
+        $controller = new App\Http\Controllers\PaymentController();
+        $method = new ReflectionMethod($controller, 'generateTokensForOrder');
+        $method->setAccessible(true);
+        $method->invoke($controller, $order);
+
+        $count = $order->items->load('tokens')->flatMap(fn($i) => $i->tokens)->count();
+        return 'Done. Tokens generated: ' . $count . ' untuk order ' . $orderNumber;
+    })->name('debug.fix-tokens');
+});
