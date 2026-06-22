@@ -48,7 +48,7 @@
     </div>
 @endif
 
-<form method="POST" action="{{ route('customer.reviews.store') }}">
+<form method="POST" action="{{ route('reviews.store') }}">
     @csrf
 
     Event:
