@@ -51,4 +51,45 @@ class ReviewController extends Controller
 
         return redirect()->route('admin.reviews.index')->with('success', 'Ulasan berhasil ditolak.');
     }
+
+    // GET /reviews
+    public function customerIndex()
+    {
+        $reviews = Review::where('user_id', auth()->id())->latest()->get();
+        return view('reviews.index', compact('reviews'));
+    }
+
+    // GET /reviews/create
+    public function create()
+    {
+        $events = \App\Models\Event::where('status', 'active')->get();
+        $orders = \App\Models\Order::where('user_id', auth()->id())->where('status', 'paid')->get();
+        return view('reviews.create', compact('events', 'orders'));
+    }
+
+    // POST /reviews
+    public function store(Request $request)
+    {
+        $request->validate([
+            'event_id' => 'required|integer',
+            'order_id' => 'required|integer',
+            'rating'   => 'required|integer|min:1|max:5',
+            'title'    => 'required|string|max:255',
+            'body'     => 'required|string',
+        ]);
+
+        Review::create([
+            'user_id'     => auth()->id(),
+            'event_id'    => $request->event_id,
+            'order_id'    => $request->order_id,
+            'rating'      => $request->rating,
+            'title'       => $request->title,
+            'body'        => $request->body,
+            'status'      => 'pending',
+            'is_approved' => false,
+        ]);
+
+    return redirect()->route('reviews.index')
+        ->with('success', 'Ulasan berhasil dikirim, menunggu moderasi admin.');
+    }
 }

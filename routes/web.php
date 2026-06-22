@@ -94,6 +94,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/gates', [GateController::class, 'index']);
     Route::post('/reviews', [ReviewController::class, 'store']);
     Route::get('/reviews', [ReviewController::class, 'index']);
+
+    Route::get('/reviews', [ReviewController::class, 'customerIndex'])->name('reviews.index');
+    Route::get('/reviews/create', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
 // Admin
