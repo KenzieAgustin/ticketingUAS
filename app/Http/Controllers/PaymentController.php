@@ -45,7 +45,8 @@ class PaymentController extends Controller
             // Tambah poin user
             $user = $order->user;
             if ($user) {
-                $pointsEarned = floor($order->total_amount / 100000) * 10;
+                $basisPoin    = $order->gross_amount ?? $order->total_amount;
+                $pointsEarned = floor($basisPoin / 100000) * 10;
                 if ($pointsEarned > 0) {
                     $user->increment('points', $pointsEarned);
                 }
@@ -62,12 +63,14 @@ class PaymentController extends Controller
                 ]
             );
 
-            \App\Models\PointHistory::create([
-                        'user_id'     => $user->id,
-                        'amount'      => $pointsEarned,
-                        'type'        => 'earn', // Sesuai dengan enum migration
-                        'description' => 'Mendapatkan poin dari pesanan ' . $order->order_number,
-                    ]);
+            if($pointsEarned > 0){
+                \App\Models\PointHistory::create([
+                    'user_id'     => $user->id,
+                    'amount'      => $pointsEarned,
+                    'type'        => 'earn',
+                    'description' => 'Mendapatkan poin dari pesanan ' . $order->order_number,
+                ]);
+            }
 
             // Generate token & QR untuk setiap order item
             $this->generateTokensForOrder($order);
@@ -112,15 +115,20 @@ class PaymentController extends Controller
         $items = OrderItem::where('order_id', $order->id)->get();
 
         foreach ($items as $item) {
-            // Skip kalau token sudah ada
-            if (TicketToken::where('order_item_id', $item->id)->exists()) {
+            $existingCount = TicketToken::where('order_item_id', $item->id)->count();
+
+            if ($existingCount >= $item->quantity) {
                 continue;
             }
 
+            $tokensToCreate = $item->quantity - $existingCount;
+
+            for ($i = 0; $i < $tokensToCreate; $i++) {
             // Generate booking code unik
             do {
                 $bookingCode = 'PRJ2026-' . strtoupper(Str::random(6));
             } while (TicketToken::where('booking_code', $bookingCode)->exists());
+
 
             // Buat folder qrcodes kalau belum ada
             if (!file_exists(public_path('qrcodes'))) {
@@ -130,10 +138,8 @@ class PaymentController extends Controller
             $fileName = $bookingCode . '.png';
             $path     = public_path('qrcodes/' . $fileName);
 
-            $qrCode = new QrCode($bookingCode);
-            $writer = new PngWriter();
-            $result = $writer->write($qrCode);
-            file_put_contents($path, $result->getString());
+            $svgContent = QrCode::format('png')->size(250)->generate($bookingCode);
+            file_put_contents($path, $svgContent);
 
             TicketToken::create([
                 'order_item_id' => $item->id,
@@ -143,6 +149,7 @@ class PaymentController extends Controller
             ]);
 
             \Log::info('Token generated: ' . $bookingCode . ' untuk order item ' . $item->id);
+            }
         }
     }
 }

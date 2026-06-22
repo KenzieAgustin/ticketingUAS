@@ -40,6 +40,7 @@ class OrderController extends Controller
             $hargaSatuan = $ticket->price;
         }
 
+        $hargaSatuanAsli = $hargaSatuan;
         $today = \Carbon\Carbon::now()->toDateString();
         $activePromo = \App\Models\PricingRule::where('ticket_id', $ticket->id)
             ->where('start_date', '<=', $today)
@@ -57,6 +58,7 @@ class OrderController extends Controller
     }
 
         $total_amount = $hargaSatuan * $quantity;
+        $gross_amount = $hargaSatuanAsli * $quantity;
 
         // Cek voucher
         $voucherId = null;
@@ -79,7 +81,7 @@ class OrderController extends Controller
         try {
             $order = null;
 
-            DB::transaction(function () use ($request, $ticket, $zone, $quantity, $hargaSatuan, $total_amount, $voucherId, &$order) {
+            DB::transaction(function () use ($request, $ticket, $zone, $quantity, $hargaSatuan, $total_amount, $gross_amount, $voucherId, &$order)  {
 
                 // Cek & kurangi kuota kalau ada zona
                 if ($zone) {
@@ -101,6 +103,7 @@ class OrderController extends Controller
                     'user_id'      => Auth::id(),
                     'order_number' => 'PRJ-' . time(),
                     'total_amount' => $total_amount,
+                    'gross_amount' => $gross_amount,
                     'voucher_id'   => $voucherId,
                     'status'       => 'pending',
                 ]);

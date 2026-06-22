@@ -19,7 +19,7 @@ class AppNotification extends Notification
         public readonly string $message,
         public readonly ?int   $refId = null,
     ){}
-    
+
 
     /**
      * Get the notification's delivery channels.
