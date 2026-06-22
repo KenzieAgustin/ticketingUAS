@@ -44,7 +44,7 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
-    
+
     Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgot'])->name('password.forgot');
     Route::post('/forgot-password', [ForgotPasswordController::class, 'sendOtp'])->name('password.send-otp');
 
