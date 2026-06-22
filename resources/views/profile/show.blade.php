@@ -40,6 +40,7 @@
     <a href="{{ route('order.index') }}">Pesanan Saya</a> |
     <a href="/tickets">Tiket Saya</a> |
     <a href="/points">Poin</a> |
+    <a href="/reviews">Ulasan</a> |
     <form method="POST" action="{{ route('logout') }}" style="display:inline">
         @csrf
         <button type="submit" style="background:none; border:none; cursor:pointer; color:#c00; padding:0; font-size:14px">Logout</button>
