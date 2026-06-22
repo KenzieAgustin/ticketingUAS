@@ -103,8 +103,11 @@ class TicketTokenController extends Controller
             ], 200);
         }
 
-        // Mark as used supaya gabisa dipake lagi
-        $token->update(['status' => 'used']);
+        // Catatan: status TIDAK diubah jadi 'used' di sini.
+        // Validasi/scan ini bersifat read-only (cek keaslian saja).
+        // Token baru di-mark 'used' saat proses Check-in benar-benar selesai
+        // (ditangani oleh CheckInService), supaya scan ulang/gagal jaringan
+        // tidak mengunci tiket yang sebenarnya belum resmi masuk venue.
 
         return response()->json([
             'success' => true,

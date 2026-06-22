@@ -6,7 +6,7 @@
     <title>Daftar Tipe Tiket</title>
 </head>
 <body style="font-family: Arial, sans-serif; padding: 20px;">
-
+    <p><a href="{{ url('/home') }}" style="color:#333; text-decoration:none; font-size:14px;">← Kembali ke Home</a></p>
     <h2>Tipe Tiket (Daftar Jenis Tiket PRJ 2026)</h2>
     <p>Menampilkan kategori utama tiket sebelum dibagi berdasarkan zona/kelas konser.</p>
     <hr>

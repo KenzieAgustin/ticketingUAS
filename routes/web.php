@@ -109,6 +109,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/gates', [GateController::class, 'index']);
     Route::post('/reviews', [ReviewController::class, 'store']);
     Route::get('/reviews', [ReviewController::class, 'index']);
+
+    Route::get('/reviews', [ReviewController::class, 'customerIndex'])->name('reviews.index');
+    Route::get('/reviews/create', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
 // Admin
@@ -120,7 +124,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Ticket admin
     Route::get('/tickets', [TicketController::class, 'adminWeb']);
-    Route::get('/tracker', [QuotaTrackerController::class, 'indexWeb']);
+    Route::get('/tracker', [QuotaTrackerController::class, 'indexWeb'])->name('tracker.index');
 
     // Refund
     Route::get('/refunds', [RefundController::class, 'index'])->name('refunds.index');
