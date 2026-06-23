@@ -56,7 +56,8 @@
         <a href="{{ route('admin.users.index') }}">Kelola User</a>
         <a href="{{ route('admin.activities.index') }}">Log Aktivitas</a>
         <a href="{{ route('admin.gates.index') }}">Gate</a>
-        <a href="{{ route('admin.staff-assignments.index') }}">Staff</a>
+        <a href="{{ route('admin.tickets.index') }}">Tiket Admin</a>
+        <a href="{{ route('admin.tracker.index') }}">Quota Tracker</a>
         <a href="{{ route('admin.check-ins.index') }}">Check-in</a>
         <a href="{{ route('admin.reviews.index') }}">Ulasan</a>
         <a href="{{ route('admin.refunds.index') }}">Refund</a>
@@ -65,7 +66,7 @@
 @endif
 
 {{-- Staff Gate section --}}
-@if(Auth::user()->isStaffGate())
+@if((Auth::user()->isStaffGate()) || Auth::user()->isAdmin())
     <div class="staff-section">
         Staff:
         <a href="{{ route('staff.scan') }}">Scan Tiket</a>

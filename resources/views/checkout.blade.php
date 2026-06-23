@@ -20,23 +20,36 @@
         <p class="text-sm text-gray-500 mb-8">Selesaikan pesanan tiket Anda</p>
 
         <div class="text-left space-y-4 mb-10 text-sm">
-            <div class="flex justify-between border-b border-gray-100 pb-3">
-                <span class="text-gray-500">Order ID</span>
-                <span class="font-medium">{{ $order->order_number }}</span>
-            </div>
-            <div class="flex justify-between border-b border-gray-100 pb-3">
-                <span class="text-gray-500">Nama</span>
-                <span class="font-medium">{{ $order->user->name }}</span>
-            </div>
-            <div class="flex justify-between border-b border-gray-100 pb-3">
-                <span class="text-gray-500">Subtotal</span>
-                <span class="font-medium">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
-            </div>
-            <div class="flex justify-between pt-2">
-                <span class="font-semibold text-base">Total Bayar</span>
-                <span class="font-bold text-lg">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
-            </div>
-        </div>
+    <div class="flex justify-between border-b border-gray-100 pb-3">
+        <span class="text-gray-500">Order ID</span>
+        <span class="font-medium">{{ $order->order_number }}</span>
+    </div>
+    <div class="flex justify-between border-b border-gray-100 pb-3">
+        <span class="text-gray-500">Nama</span>
+        <span class="font-medium">{{ $order->user->name }}</span>
+    </div>
+    <div class="flex justify-between border-b border-gray-100 pb-3">
+        <span class="text-gray-500">Harga Sebelum Diskon</span>
+        <span class="font-medium">Rp {{ number_format($order->gross_amount, 0, ',', '.') }}</span>
+    </div>
+    @php
+        $diskonTotal = $order->gross_amount - $order->total_amount;
+    @endphp
+    @if($diskonTotal > 0)
+    <div class="flex justify-between border-b border-gray-100 pb-3">
+        <span class="text-green-600">Diskon</span>
+        <span class="font-medium text-green-600">- Rp {{ number_format($diskonTotal, 0, ',', '.') }}</span>
+    </div>
+    @endif
+    <div class="flex justify-between border-b border-gray-100 pb-3">
+        <span class="text-gray-500">Harga Setelah Diskon</span>
+        <span class="font-medium">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+    </div>
+    <div class="flex justify-between pt-2">
+        <span class="font-semibold text-base">Total Bayar</span>
+        <span class="font-bold text-lg">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
+    </div>
+</div>
 
         <button id="pay-button"
             class="w-full bg-black hover:bg-gray-800 text-white font-semibold py-4 rounded-xl text-sm transition-colors">

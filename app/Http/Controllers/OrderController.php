@@ -11,6 +11,7 @@ use App\Models\TicketZone;
 use App\Models\Ticket;
 use App\Models\Voucher;
 use App\Models\WaitList;
+use App\Notifications\AppNotification;
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -39,25 +40,48 @@ class OrderController extends Controller
             $hargaSatuan = $ticket->price;
         }
 
+        $hargaSatuanAsli = $hargaSatuan;
+        $today = \Carbon\Carbon::now()->toDateString();
+        $activePromo = \App\Models\PricingRule::where('ticket_id', $ticket->id)
+            ->where('start_date', '<=', $today)
+            ->where('end_date', '>=', $today)
+            ->first();
+
+        if ($activePromo) {
+            $discountApplied = 0;
+        if ($activePromo->discount_type === 'fixed') {
+            $discountApplied = $activePromo->discount_value;
+        } elseif ($activePromo->discount_type === 'percentage') {
+            $discountApplied = round($hargaSatuan * ($activePromo->discount_value / 100));
+        }
+        $hargaSatuan = max(0, $hargaSatuan - $discountApplied);
+    }
+
         $total_amount = $hargaSatuan * $quantity;
+        $gross_amount = $hargaSatuanAsli * $quantity;
 
         // Cek voucher
         $voucherId = null;
         if ($request->filled('voucher_code')) {
             $voucher = Voucher::where('code', trim($request->voucher_code))
-                ->where('valid_until', '>=', now())
-                ->where('max_usage', '>', 0)
+                ->where(function ($q) {
+                    $q->whereNull('expired_at')->orWhere('expired_at', '>=', now());
+                })
+                ->where(function ($q) {
+                    $q->whereNull('quota')->orWhereColumn('used', '<', 'quota');
+                })
                 ->first();
-            if ($voucher) {
-                $total_amount = max(1, $total_amount - $voucher->discount_amount);
-                $voucherId    = $voucher->id;
+
+            if ($voucher && $voucher->isValid()) {
+            $total_amount = max(1, $total_amount - $voucher->discount_amount);
+            $voucherId    = $voucher->id;
             }
         }
 
         try {
             $order = null;
 
-            DB::transaction(function () use ($request, $ticket, $zone, $quantity, $hargaSatuan, $total_amount, $voucherId, &$order) {
+            DB::transaction(function () use ($request, $ticket, $zone, $quantity, $hargaSatuan, $total_amount, $gross_amount, $voucherId, &$order)  {
 
                 // Cek & kurangi kuota kalau ada zona
                 if ($zone) {
@@ -77,11 +101,16 @@ class OrderController extends Controller
                 // Buat order
                 $order = Order::create([
                     'user_id'      => Auth::id(),
-                    'order_number' => 'ORD-' . time(),
+                    'order_number' => 'PRJ-' . time(),
                     'total_amount' => $total_amount,
+                    'gross_amount' => $gross_amount,
                     'voucher_id'   => $voucherId,
                     'status'       => 'pending',
                 ]);
+
+                if ($voucherId) {
+                    \App\Models\Voucher::where('id', $voucherId)->increment('used');
+                }
 
                 // Buat order item
                 OrderItem::create([
@@ -92,6 +121,13 @@ class OrderController extends Controller
                     'subtotal'       => $hargaSatuan * $quantity,
                 ]);
             });
+
+            // Mancing notif
+            Auth::user()->notify(new AppNotification(
+                type: 'order_created',
+                message: '🧾 Pesanan #' . $order->order_number . ' berhasil dibuat. Segera selesaikan pembayaran!',
+                refId: $order->id,
+            ));
 
             // Midtrans
             Config::$serverKey    = env('MIDTRANS_SERVER_KEY');
@@ -111,6 +147,7 @@ class OrderController extends Controller
             ];
 
             $snapToken = Snap::getSnapToken($params);
+            $order->update(['snap_token' => $snapToken]);
 
             return view('checkout', [
                 'snapToken' => $snapToken,
@@ -124,6 +161,7 @@ class OrderController extends Controller
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
 
     public function index(Request $request)
     {
@@ -143,19 +181,54 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        $order = Order::where('user_id', Auth::id())->findOrFail($id);
-        return view('orders.show', compact('order'));
+        $order = Order::where('user_id', Auth::id())
+                        ->with(['items.ticketZone.ticket', 'items.tokens'])
+                        ->findOrFail($id);
+
+        $snapToken = $order->snap_token;
+
+        if ($order->status === 'pending') {
+            Config::$serverKey    = env('MIDTRANS_SERVER_KEY');
+            Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
+            Config::$isSanitized  = true;
+            Config::$is3ds        = true;
+
+            $params = [
+                'transaction_details' => [
+                    'order_id'     => $order->order_number,
+                    'gross_amount' => (int) $order->total_amount,
+                ],
+                'customer_details' => [
+                    'first_name' => Auth::user()->name,
+                    'email'      => Auth::user()->email,
+                ],
+            ];
+
+            try {
+                $snapToken = Snap::getSnapToken($params);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Gagal generate snap token: ' . $e->getMessage());
+            }
+        }
+
+        return view('orders.show', compact('order', 'snapToken'));
     }
 
     public function checkVoucher(Request $request)
     {
-        $voucher = Voucher::where('code', $request->voucher_code)
-            ->where('valid_until', '>=', now())
-            ->where('max_usage', '>', 0)
-            ->first();
+        $voucherId = null;
+        if ($request->filled('voucher_code')) {
+                $voucher = Voucher::where('code', $request->voucher_code)
+                    ->where(function ($q) {
+                        $q->whereNull('expired_at')->orWhere('expired_at', '>=', now());
+                    })
+                    ->where(function ($q) {
+                        $q->whereNull('quota')->orWhereColumn('used', '<', 'quota');
+                    })
+                    ->first();
 
-        if ($voucher) {
-            return response()->json([
+            if ($voucher && $voucher->isValid()) {
+                return response()->json([
                 'status'          => 'success',
                 'discount_amount' => $voucher->discount_amount,
                 'message'         => 'Voucher berhasil digunakan!',
@@ -166,6 +239,7 @@ class OrderController extends Controller
             'status'          => 'error',
             'discount_amount' => 0,
             'message'         => 'Voucher tidak valid, kadaluarsa, atau kuota habis.',
-        ]);
+            ]);
+        }
     }
 }

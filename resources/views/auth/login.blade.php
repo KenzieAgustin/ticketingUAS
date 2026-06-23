@@ -23,7 +23,14 @@
     <p class="subtitle">Masuk ke akun kamu</p>
 
     @if ($errors->any())
-        <div class="alert-error">{{ $errors->first('email') }}</div>
+        @php $message = $errors->first('email'); @endphp
+        @if(str_contains($message, 'terkunci'))
+            <div style="padding: 8px 12px; background: #fff8e1; border-left: 3px solid #f0a500; margin-bottom: 16px; font-size: 14px; color: #8a6d00;">
+                {{ $message }}
+            </div>
+        @else
+            <div class="alert-error">{{ $message }}</div>
+        @endif
     @endif
 
     @if (session('success'))
@@ -41,7 +48,9 @@
 
         <label style="font-size:14px">
             <input type="checkbox" name="remember"> Ingat saya
-        </label><br><br>
+        </label>
+        <a href="{{ route('password.forgot') }}" style="font-size:13px; float:right; color:#888;">Lupa password?</a>
+        <br><br>
 
         <button type="submit">Login</button>
     </form>

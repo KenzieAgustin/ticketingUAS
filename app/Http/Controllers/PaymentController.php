@@ -8,7 +8,10 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Models\TicketToken;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Mail\TicketPurchased;
+use Illuminate\Support\Facades\Mail;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
 
 class PaymentController extends Controller
 {
@@ -42,7 +45,8 @@ class PaymentController extends Controller
             // Tambah poin user
             $user = $order->user;
             if ($user) {
-                $pointsEarned = floor($order->total_amount / 100000) * 10;
+                $basisPoin    = $order->gross_amount ?? $order->total_amount;
+                $pointsEarned = floor($basisPoin / 100000) * 10;
                 if ($pointsEarned > 0) {
                     $user->increment('points', $pointsEarned);
                 }
@@ -59,8 +63,28 @@ class PaymentController extends Controller
                 ]
             );
 
+            if($pointsEarned > 0){
+                \App\Models\PointHistory::create([
+                    'user_id'     => $user->id,
+                    'amount'      => $pointsEarned,
+                    'type'        => 'earn',
+                    'description' => 'Mendapatkan poin dari pesanan ' . $order->order_number,
+                ]);
+            }
+
             // Generate token & QR untuk setiap order item
             $this->generateTokensForOrder($order);
+
+            // Kirim email e-tiket ke pembeli
+            $order->refresh();
+            if ($order->user && $order->user->email) {
+                try {
+                    Mail::to($order->user->email)->send(new TicketPurchased($order));
+                    \Log::info('Email tiket terkirim ke: ' . $order->user->email);
+                } catch (\Exception $e) {
+                    \Log::error('Gagal kirim email tiket: ' . $e->getMessage());
+                }
+            }
 
         } elseif ($request->transaction_status === 'expire') {
             $order->update(['status' => 'expired']);
@@ -91,15 +115,20 @@ class PaymentController extends Controller
         $items = OrderItem::where('order_id', $order->id)->get();
 
         foreach ($items as $item) {
-            // Skip kalau token sudah ada
-            if (TicketToken::where('order_item_id', $item->id)->exists()) {
+            $existingCount = TicketToken::where('order_item_id', $item->id)->count();
+
+            if ($existingCount >= $item->quantity) {
                 continue;
             }
 
+            $tokensToCreate = $item->quantity - $existingCount;
+
+            for ($i = 0; $i < $tokensToCreate; $i++) {
             // Generate booking code unik
             do {
                 $bookingCode = 'PRJ2026-' . strtoupper(Str::random(6));
             } while (TicketToken::where('booking_code', $bookingCode)->exists());
+
 
             // Buat folder qrcodes kalau belum ada
             if (!file_exists(public_path('qrcodes'))) {
@@ -109,7 +138,10 @@ class PaymentController extends Controller
             $fileName = $bookingCode . '.png';
             $path     = public_path('qrcodes/' . $fileName);
 
-            QrCode::format('png')->size(250)->generate($bookingCode, $path);
+            $qrCode = new QrCode($bookingCode);
+            $writer = new PngWriter();
+            $result = $writer->write($qrCode);
+            file_put_contents($path, $result->getString());
 
             TicketToken::create([
                 'order_item_id' => $item->id,
@@ -119,6 +151,7 @@ class PaymentController extends Controller
             ]);
 
             \Log::info('Token generated: ' . $bookingCode . ' untuk order item ' . $item->id);
+            }
         }
     }
 }

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
 use App\Models\TicketToken;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Notifications\AppNotification;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Http\Request;
 
 class TicketTokenController extends Controller
@@ -40,7 +42,10 @@ class TicketTokenController extends Controller
         $path = public_path('qrcodes/' . $fileName);
 
         // Generate QR code dan simpan sebagai file PNG
-        QrCode::format('png')->size(250)->generate($bookingCode, $path);
+        $qrCode = new QrCode($bookingCode);
+        $writer = new PngWriter();
+        $result = $writer->write($qrCode);
+        file_put_contents($path, $result->getString());
 
         $token = TicketToken::create([
             'order_item_id' => $request->order_item_id,
@@ -48,6 +53,14 @@ class TicketTokenController extends Controller
             'qr_code_path'  => 'qrcodes/' . $fileName,
             'status'        => 'valid',
         ]);
+
+        // Ngambil user dari order item buat mancing notif
+        $orderItem = \App\Models\OrderItem::find($request->order_item_id);
+        $orderItem?->order?->user?->notify(new AppNotification(
+            type: 'ticket_generated',
+            message: '🎫 Tiket kamu dengan kode ' . $bookingCode . ' berhasil dibuat. Tunjukkan QR code saat masuk!',
+            refId: $token->id,
+        ));
 
         return response()->json([
             'success' => true,
@@ -62,7 +75,7 @@ class TicketTokenController extends Controller
         $request->validate([
             'booking_code' => 'required|string',
         ]);
-        
+
         //cari token pake booking code
         $token = TicketToken::with('orderItem.ticketZone.ticket')
             ->where('booking_code', $request->booking_code)
@@ -90,8 +103,11 @@ class TicketTokenController extends Controller
             ], 200);
         }
 
-        // Mark as used supaya gabisa dipake lagi
-        $token->update(['status' => 'used']);
+        // Catatan: status TIDAK diubah jadi 'used' di sini.
+        // Validasi/scan ini bersifat read-only (cek keaslian saja).
+        // Token baru di-mark 'used' saat proses Check-in benar-benar selesai
+        // (ditangani oleh CheckInService), supaya scan ulang/gagal jaringan
+        // tidak mengunci tiket yang sebenarnya belum resmi masuk venue.
 
         return response()->json([
             'success' => true,

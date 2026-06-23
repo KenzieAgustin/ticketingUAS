@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OrderNotification extends Notification
+class AppNotification extends Notification
 {
     use Queueable;
 
@@ -19,7 +19,7 @@ class OrderNotification extends Notification
         public readonly string $message,
         public readonly ?int   $refId = null,
     ){}
-    
+
 
     /**
      * Get the notification's delivery channels.
@@ -28,10 +28,10 @@ class OrderNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['database'];
     }
 
-    public function toArray(object $notifiable): array
+    public function toDatabase(object $notifiable): array
     {
         return [
             'type'    => $this->type,
@@ -39,5 +39,22 @@ class OrderNotification extends Notification
             'ref_id'  => $this->refId,
             'icon'    => $this->getIcon(),
         ];
+    }
+
+    private function getIcon(): string
+    {
+        return match($this->type) {
+            'order_created'    => '🧾',
+            'refund_request'   => '🔄',
+            'refund_approved'  => '✅',
+            'refund_rejected'  => '❌',
+            'review_approved'  => '⭐',
+            'review_rejected'  => '🚫',
+            'ticket_generated' => '🎫',
+            'waitlist_joined'  => '📋',
+            'points_redeemed'  => '🎁',
+            'new_refund_admin' => '🔔',
+            default            => '🔔',
+        };
     }
 }
