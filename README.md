@@ -104,27 +104,6 @@ https://<ngrok-url>/payment/webhook
 
 Ubah role user via `/admin/users` (login sebagai admin).
 
-## Struktur Modul
-
-```
-app/
-├── Http/Controllers/     # Controller per modul
-├── Models/               # Eloquent models
-├── Services/             # CheckInService
-├── Notifications/        # AppNotification
-└── Mail/                 # TicketPurchased, OtpMail
-
-database/
-├── migrations/           # Skema tabel
-└── seeders/              # GateSeeder, TicketSeeder
-
-resources/views/
-├── admin/                # Panel admin
-├── staff/                # Panel staff gate
-├── support/              # Halaman support customer
-└── tickets/, orders/, ...
-```
-
 ## Catatan
 
 - Folder `public/qrcodes/` di-generate otomatis saat transaksi pertama berhasil.
