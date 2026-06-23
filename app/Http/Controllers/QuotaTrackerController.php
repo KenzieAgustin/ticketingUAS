@@ -10,7 +10,14 @@ class QuotaTrackerController extends Controller
     public function indexWeb()
     {
         $trackerData = TicketZone::with('ticket')->get();
-        return view('tracker.index', compact('trackerData'));
+        $zoneIds = $trackerData->pluck('id');
+
+        $orderItems = \App\Models\OrderItem::with(['tokens', 'order.user', 'order.payment'])
+            ->whereIn('ticket_zone_id', $zoneIds)
+            ->get()
+            ->groupBy('ticket_zone_id');
+
+        return view('tracker.index', compact('trackerData', 'orderItems'));
     }
 
     //status kuota semua zone
@@ -40,7 +47,7 @@ class QuotaTrackerController extends Controller
     public function show($id)
     {
         $zone = TicketZone::with('ticket')->findOrFail($id);
-        
+
         return response()->json([
             'success' => true,
             'data' => [
