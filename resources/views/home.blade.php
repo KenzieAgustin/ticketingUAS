@@ -70,6 +70,7 @@
         Staff:
         <a href="{{ route('staff.scan') }}">Scan Tiket</a>
         <a href="{{ route('staff.check-ins.scan') }}">Check-in</a>
+        <a href="{{ route('staff.gates.index') }}">Gate</a>
     </div>
 @endif
 

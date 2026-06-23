@@ -36,6 +36,7 @@
             <a href="{{ route('order.index') }}" class="font-bold hover:underline">Pesanan Saya</a> |
             <a href="/tickets" class="hover:underline">Tiket Saya</a> |
             <a href="/points" class="hover:underline">Poin</a> |
+            <a href="{{ route('reviews.index') }}" class="hover:underline">Ulasan</a> |
             <form method="POST" action="{{ route('logout') }}" style="display:inline">
                 @csrf
                 <button type="submit" style="background:none; border:none; cursor:pointer; color:#c00; font-size:14px; padding:0;">Logout</button>
