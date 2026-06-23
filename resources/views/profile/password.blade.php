@@ -42,21 +42,51 @@
 
     <div class="form-group">
         <label>Password saat ini</label>
-        <input type="password" name="current_password" required>
+        <div style="position:relative; max-width:340px;">
+            <input type="password" name="current_password" id="current_password" required
+                style="width:100%; padding:6px; padding-right:90px; box-sizing:border-box;">
+            <span onclick="togglePassword('current_password', this)"
+                style="position:absolute; right:8px; top:50%; transform:translateY(-50%); cursor:pointer; color:#888; font-size:12px; user-select:none;">Tampilkan</span>
+        </div>
     </div>
+
     <div class="form-group">
         <label>Password baru</label>
-        <input type="password" name="password" required>
+        <div style="position:relative; max-width:340px;">
+            <input type="password" name="password" id="password" required
+                style="width:100%; padding:6px; padding-right:90px; box-sizing:border-box;">
+            <span onclick="togglePassword('password', this)"
+                style="position:absolute; right:8px; top:50%; transform:translateY(-50%); cursor:pointer; color:#888; font-size:12px; user-select:none;">Tampilkan</span>
+        </div>
     </div>
+
     <div class="form-group">
         <label>Konfirmasi password baru</label>
-        <input type="password" name="password_confirmation" required>
+        <div style="position:relative; max-width:340px;">
+            <input type="password" name="password_confirmation" id="password_confirmation" required
+                style="width:100%; padding:6px; padding-right:90px; box-sizing:border-box;">
+            <span onclick="togglePassword('password_confirmation', this)"
+                style="position:absolute; right:8px; top:50%; transform:translateY(-50%); cursor:pointer; color:#888; font-size:12px; user-select:none;">Tampilkan</span>
+        </div>
     </div>
     <button class="btn" type="submit">Ganti password</button>
 </form>
 
 <hr>
 <a href="{{ route('profile.show') }}" style="font-size:13px; color:#888; text-decoration:none;">← Kembali ke profil</a>
+
+<script>
+function togglePassword(id, el) {
+    const input = document.getElementById(id);
+    if (input.type === 'password') {
+        input.type = 'text';
+        el.textContent = 'Sembunyikan';
+    } else {
+        input.type = 'password';
+        el.textContent = 'Tampilkan';
+    }
+}
+</script>
 
 </body>
 </html>

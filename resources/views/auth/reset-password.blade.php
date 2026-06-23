@@ -27,11 +27,42 @@
     <form method="POST" action="{{ route('password.reset') }}">
         @csrf
         <input type="hidden" name="email" value="{{ $email }}">
+
         <label>Password Baru</label>
-        <input type="password" name="password" required>
+        <div style="position:relative;">
+            <input type="password" name="password" id="password" required
+                style="width:100%; padding:6px; padding-right:35px; box-sizing:border-box; margin-bottom:12px;">
+            <span onclick="togglePassword('password', this)"
+                style="position:absolute; right:8px; top:50%; transform:translateY(-50%); cursor:pointer; color:#888; font-size:12px; user-select:none;">
+                Tampilkan
+            </span>
+        </div>
+
         <label>Konfirmasi Password</label>
-        <input type="password" name="password_confirmation" required>
+        <div style="position:relative;">
+            <input type="password" name="password_confirmation" id="password_confirmation" required
+                style="width:100%; padding:6px; padding-right:35px; box-sizing:border-box; margin-bottom:12px;">
+            <span onclick="togglePassword('password_confirmation', this)"
+                style="position:absolute; right:8px; top:50%; transform:translateY(-50%); cursor:pointer; color:#888; font-size:12px; user-select:none;">
+                Tampilkan
+            </span>
+        </div>
+
         <button class="btn" type="submit">Reset Password</button>
     </form>
+
+<script>
+function togglePassword(id, el) {
+    const input = document.getElementById(id);
+    if (input.type === 'password') {
+        input.type = 'text';
+        el.textContent = 'Sembunyikan';
+    } else {
+        input.type = 'password';
+        el.textContent = 'Tampilkan';
+    }
+}
+</script>
+
 </body>
 </html>

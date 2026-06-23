@@ -39,16 +39,39 @@
         <input type="email" name="email" value="{{ old('email') }}" required>
 
         <label>Password</label><br>
-        <input type="password" name="password" required>
+        <div style="position:relative;">
+            <input type="password" name="password" id="password" required
+                style="width:100%; padding:7px 10px; margin:4px 0 14px; border:1px solid #ccc; border-radius:4px; font-size:14px; box-sizing:border-box; padding-right:90px;">
+            <span onclick="togglePassword('password', this)"
+                style="position:absolute; right:8px; top:35%; cursor:pointer; color:#888; font-size:12px; user-select:none;">Tampilkan</span>
+        </div>
 
         <label>Konfirmasi Password</label><br>
-        <input type="password" name="password_confirmation" required>
+        <div style="position:relative;">
+            <input type="password" name="password_confirmation" id="password_confirmation" required
+                style="width:100%; padding:7px 10px; margin:4px 0 14px; border:1px solid #ccc; border-radius:4px; font-size:14px; box-sizing:border-box; padding-right:90px;">
+            <span onclick="togglePassword('password_confirmation', this)"
+                style="position:absolute; right:8px; top:35%; cursor:pointer; color:#888; font-size:12px; user-select:none;">Tampilkan</span>
+        </div>
 
         <button type="submit">Daftar</button>
     </form>
 
     <hr>
     <p>Sudah punya akun? <a href="{{ route('login') }}">Login di sini</a></p>
+
+<script>
+function togglePassword(id, el) {
+    const input = document.getElementById(id);
+    if (input.type === 'password') {
+        input.type = 'text';
+        el.textContent = 'Sembunyikan';
+    } else {
+        input.type = 'password';
+        el.textContent = 'Tampilkan';
+    }
+}
+</script>
 
 </body>
 </html>
