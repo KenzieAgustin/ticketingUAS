@@ -1,59 +1,132 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ticketingUAS — Pekan Raya Jakarta 2026
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Tech Stack
+- **Backend:** PHP 8.2, Laravel 12
+- **Database:** MySQL
+- **Payment Gateway:** Midtrans Snap (sandbox)
+- **QR Code:** endroid/qr-code
+- **Email:** Gmail SMTP
 
-## About Laravel
+## Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+| Modul | Fitur |
+| Auth | Register + OTP email, Login, Forgot password, Account lockout |
+| Ticket & Token | Jenis tiket, zona konser, pricing rule, quota tracker, waitlist, booking code & QR, check-in kamera |
+| Order & Payment | Checkout, Midtrans Snap, webhook, voucher, poin reward |
+| Operational | Gate management, staff assignment, check-in monitoring, dashboard |
+| Support | Tiket support customer ↔ admin, notifikasi |
+| Report | Sales report harian & per zona |
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tim Pengembang
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Yohanes Phandry | 535250054 | Auth & User Management |
+| Jessica | 535250093 | Event & Konser |
+| Kenzie Agustin | 535250079 | Ticket & Token |
+| Nicholous Salim | 535250095 | Order & Payment |
+| Chatrina Tricia | 535250096 | Operational & Report |
 
-## Learning Laravel
+## Instalasi
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Prasyarat
+- PHP >= 8.2
+- Composer
+- MySQL
+- Node.js & npm
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Langkah Setup
 
-## Laravel Sponsors
+```bash
+# 1. Clone repository
+git clone https://github.com/KenzieAgustin/ticketingUAS.git
+cd ticketingUAS
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# 2. Install dependencies
+composer install
+npm install
 
-### Premium Partners
+# 3. Konfigurasi environment
+cp .env.example .env
+php artisan key:generate
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Edit `.env` sesuai konfigurasi lokal:
 
-## Contributing
+```env
+DB_DATABASE=ticketing_uas_db
+DB_USERNAME=root
+DB_PASSWORD=
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+MIDTRANS_SERVER_KEY=your_sandbox_server_key
+MIDTRANS_CLIENT_KEY=your_sandbox_client_key
+MIDTRANS_IS_PRODUCTION=false
 
-## Code of Conduct
+MAIL_USERNAME=your_gmail@gmail.com
+MAIL_PASSWORD=your_gmail_app_password
+MAIL_FROM_ADDRESS=your_gmail@gmail.com
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+> **Gmail:** Gunakan [App Password](https://myaccount.google.com/apppasswords), bukan password akun biasa.
 
-## Security Vulnerabilities
+```bash
+# 4. Migrasi & seeder
+php artisan migrate
+php artisan db:seed
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# 5. Build assets
+npm run dev
 
-## License
+# 6. Jalankan server
+php artisan serve
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Akses di `http://127.0.0.1:8000`.
+
+### Midtrans Webhook (lokal)
+
+Gunakan ngrok untuk expose localhost agar webhook Midtrans bisa masuk:
+
+```bash
+ngrok http 8000
+```
+
+Set URL webhook di [Midtrans Dashboard](https://dashboard.sandbox.midtrans.com):
+```
+https://<ngrok-url>/payment/webhook
+```
+
+## Role & Akses
+
+| Role | Akses |
+|---|---|
+| `customer` | Beli tiket, lihat order, support, ulasan |
+| `staff_gate` | Scan QR check-in |
+| `admin` | Semua fitur + manajemen user, gate, laporan |
+
+Ubah role user via `/admin/users` (login sebagai admin).
+
+## Struktur Modul
+
+```
+app/
+├── Http/Controllers/     # Controller per modul
+├── Models/               # Eloquent models
+├── Services/             # CheckInService
+├── Notifications/        # AppNotification
+└── Mail/                 # TicketPurchased, OtpMail
+
+database/
+├── migrations/           # Skema tabel
+└── seeders/              # GateSeeder, TicketSeeder
+
+resources/views/
+├── admin/                # Panel admin
+├── staff/                # Panel staff gate
+├── support/              # Halaman support customer
+└── tickets/, orders/, ...
+```
+
+## Catatan
+
+- Folder `public/qrcodes/` di-generate otomatis saat transaksi pertama berhasil.
+- Debug route `/debug/fix-tokens/{orderNumber}` hanya aktif di `APP_ENV=local` dan role admin.
+- Untuk production, set `APP_ENV=production` dan `APP_DEBUG=false`.
