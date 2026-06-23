@@ -29,6 +29,7 @@ use App\Http\Controllers\WaitListController;
 use App\Http\Controllers\TicketTokenController;
 use App\Http\Controllers\PricingRuleController;
 use App\Http\Controllers\QuotaTrackerController;
+use App\Http\Controllers\SupportTicketController;
 
 // Root
 Route::get('/', fn() => redirect()->route('login'));
@@ -105,6 +106,14 @@ Route::middleware('auth')->group(function () {
     Route::resource('event-schedules', EventScheduleWebController::class)->names('web.event-schedules');
     Route::resource('event-media', EventMediaWebController::class)->names('web.event-media');
 
+    // Support (customer)
+    Route::get('/support', [SupportTicketController::class, 'index'])->name('support.index');
+    Route::get('/support/create', [SupportTicketController::class, 'create'])->name('support.create');
+    Route::post('/support', [SupportTicketController::class, 'store'])->name('support.store');
+    Route::get('/support/{ticket}', [SupportTicketController::class, 'show'])->name('support.show');
+    Route::post('/support/{ticket}/reply', [SupportTicketController::class, 'reply'])->name('support.reply');
+    Route::patch('/support/{ticket}/close', [SupportTicketController::class, 'close'])->name('support.close');
+
     // Reviews (customer)
     Route::get('/reviews', [ReviewController::class, 'customerIndex'])->name('reviews.index');
     Route::get('/reviews/create', [ReviewController::class, 'create'])->name('reviews.create');
@@ -147,6 +156,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/check-ins', [CheckInController::class, 'index'])->name('check-ins.index');
     Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan');
 
+    // Support (admin)
+    Route::get('/support', [SupportTicketController::class, 'adminIndex'])->name('support.index');
+    Route::get('/support/{ticket}', [SupportTicketController::class, 'adminShow'])->name('support.show');
+    Route::post('/support/{ticket}/reply', [SupportTicketController::class, 'adminReply'])->name('support.reply');
+    Route::patch('/support/{ticket}/close', [SupportTicketController::class, 'adminClose'])->name('support.close');
+
     // Reviews (admin)
     Route::get('/reviews', [ReviewController::class, 'adminIndex'])->name('reviews.index');
     Route::patch('/reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
@@ -161,7 +176,7 @@ Route::middleware(['auth', 'role:admin,staff_gate'])->prefix('staff')->name('sta
     Route::post('/check-ins/scan', [CheckInController::class, 'scan'])->name('check-ins.scan.post');
 });
 
-// Debug  emergency tool khusus admin, hanya aktif di environment local/development.
+// Debug — emergency tool khusus admin, hanya aktif di environment local/development.
 // Gunakan ini kalau ada order yang tokennya gagal generate (misal webhook Midtrans timeout).
 // Contoh: /debug/fix-tokens/PRJ-XXXXXX
 Route::middleware(['auth', 'role:admin'])->group(function () {

@@ -43,6 +43,9 @@
     <a href="/tickets">Tiket Saya</a> |
     <a href="/points">Poin</a> |
     <a href="/reviews">Ulasan</a> |
+    @if(!Auth::user()->isAdmin())
+    <a href="{{ route('support.index') }}">Support</a> |
+    @endif
     <form method="POST" action="{{ route('logout') }}" style="display:inline">
         @csrf
         <button type="submit" style="background:none; border:none; cursor:pointer; color:#c00; padding:0; font-size:14px">Logout</button>
@@ -61,6 +64,7 @@
         <a href="{{ route('admin.check-ins.index') }}">Check-in</a>
         <a href="{{ route('admin.reviews.index') }}">Ulasan</a>
         <a href="{{ route('admin.refunds.index') }}">Refund</a>
+        <a href="{{ route('admin.support.index') }}">Support</a>
         <a href="{{ route('admin.dashboard') }}">Dashboard</a>
     </div>
 @endif
