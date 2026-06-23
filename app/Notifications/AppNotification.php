@@ -54,6 +54,10 @@ class AppNotification extends Notification
             'waitlist_joined'  => '📋',
             'points_redeemed'  => '🎁',
             'new_refund_admin' => '🔔',
+            'support_new'      => '💬',
+            'support_reply'    => '↩️',
+            'support_answered' => '💬',
+            'support_closed'   => '🔒',
             default            => '🔔',
         };
     }

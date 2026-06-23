@@ -149,6 +149,7 @@ class AuthController extends Controller
         // Password salah tambah counter gagal login
         if ($user) {
             $user->incrementFailedAttempts();
+            $user->refresh();
 
             $remainingAttempts = max(0, 5 - $user->failed_login_attempts);
 

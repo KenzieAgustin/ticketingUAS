@@ -44,7 +44,14 @@
         <input type="email" name="email" value="{{ old('email') }}" required autofocus>
 
         <label>Password</label><br>
-        <input type="password" name="password" required>
+        <div style="position:relative;">
+            <input type="password" name="password" id="password" required
+                style="width:100%; padding:7px 10px; margin:4px 0 14px; border:1px solid #ccc; border-radius:4px; font-size:14px; box-sizing:border-box;">
+            <span onclick="togglePassword('password', this)"
+                style="position:absolute; right:8px; top:50%; transform:translateY(-50%); cursor:pointer; color:#888; font-size:12px; user-select:none;">
+                Tampilkan
+            </span>
+        </div>
 
         <label style="font-size:14px">
             <input type="checkbox" name="remember"> Ingat saya
@@ -57,6 +64,19 @@
 
     <hr>
     <p>Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a></p>
+
+<script>
+function togglePassword(id, el) {
+    const input = document.getElementById(id);
+    if (input.type === 'password') {
+        input.type = 'text';
+        el.textContent = 'Sembunyikan';
+    } else {
+        input.type = 'password';
+        el.textContent = 'Tampilkan';
+    }
+}
+</script>
 
 </body>
 </html>
