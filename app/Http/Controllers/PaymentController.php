@@ -143,6 +143,11 @@ class PaymentController extends Controller
             $result = $writer->write($qrCode);
             file_put_contents($path, $result->getString());
 
+            $qrCode = new QrCode($bookingCode);
+            $writer = new PngWriter();
+            $result = $writer->write($qrCode);
+            file_put_contents($path, $result->getString());
+
             TicketToken::create([
                 'order_item_id' => $item->id,
                 'booking_code'  => $bookingCode,
