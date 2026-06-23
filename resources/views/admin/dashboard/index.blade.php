@@ -51,6 +51,7 @@
     <a href="{{ route('admin.reviews.index') }}" class="{{ request()->routeIs('admin.reviews*') ? 'active' : '' }}">Ulasan</a>
     <a href="{{ route('admin.refunds.index') }}" class="{{ request()->routeIs('admin.refunds*') ? 'active' : '' }}">Refund</a>
     <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard*') ? 'active' : '' }}">Dashboard</a>
+    <a href="{{ route('admin.sales-report.index') }}" class="{{ request()->routeIs('admin.sales-report*') ? 'active' : '' }}">Sales Report</a>
 </div>
 
 <hr>

@@ -66,6 +66,7 @@
         <a href="{{ route('admin.refunds.index') }}">Refund</a>
         <a href="{{ route('admin.support.index') }}">Support</a>
         <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+        <a href="{{ route('admin.sales-report.index') }}">Sales Report</a>
     </div>
 @endif
 

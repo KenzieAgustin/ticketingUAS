@@ -141,6 +141,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard/summary', [DashboardController::class, 'summary'])->name('dashboard.summary');
     Route::get('/sales-report', [SalesReportController::class, 'index'])->name('sales-report.index');
     Route::get('/operational', [DashboardController::class, 'index'])->name('operational');
+    
 
     // Gates — pakai resource, manual routes dihapus karena redundan
     Route::resource('gates', GateController::class)->except(['create', 'edit'])->names('gates');
