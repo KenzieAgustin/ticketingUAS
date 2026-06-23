@@ -7,9 +7,10 @@
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <title>Scan Check-in</title>
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; }
+        body { font-family: sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; color: #333; }
         h1 { font-size: 20px; margin-bottom: 2px; }
         .subtitle { font-size: 13px; color: #888; margin-bottom: 16px; }
+        nav { font-size: 14px; }
         nav a { color: #333; text-decoration: none; margin-right: 4px; }
         nav a:hover { text-decoration: underline; }
         hr { border: none; border-top: 1px solid #ddd; margin: 16px 0; }
@@ -41,17 +42,23 @@
 <body>
 
 <h1>Pekan Raya Jakarta</h1>
-<p class="subtitle">{{ Auth::user()->name }} — {{ Auth::user()->role }}</p>
+<p class="subtitle">Log aktivitas user</p>
 
 <nav>
-    <a href="{{ route('home') }}">Home</a> |
-    <a href="{{ route('staff.gates.index') }}">Gate</a> |
-    <a href="{{ route('staff.check-ins.scan') }}">Scan Check-in</a> |
+    <a href="{{ route('home') }}">← Home</a> |
+    <a href="{{ route('profile.show') }}">Profil</a> |
     <form method="POST" action="{{ route('logout') }}" style="display:inline">
         @csrf
-        <button type="submit" style="background:none;border:none;cursor:pointer;color:#c00;padding:0;font-size:14px">Logout</button>
+        <button type="submit" style="background:none; border:none; cursor:pointer; color:#c00; padding:0; font-size:14px">Logout</button>
     </form>
 </nav>
+
+<div class="staff-nav">
+    Staff:
+    <a href="{{ route('staff.scan') }}">Scan Tiket</a>
+    <a href="{{ route('staff.check-ins.scan') }}">Scan Check-in</a> |
+    <a href="{{ route('staff.gates.index') }}">Gate</a> |
+</div>
 
 <hr>
 
