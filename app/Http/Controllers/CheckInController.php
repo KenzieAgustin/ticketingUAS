@@ -62,7 +62,8 @@ class CheckInController extends Controller
 
         return redirect()->route('staff.check-ins.scan')
             ->with('success', $msg)
-            ->with('error', $err);
+            ->with('error', $err)
+            ->with('last_scanned_code', $request->booking_code);
     }
 
     // GET /staff/check-ins/scan
